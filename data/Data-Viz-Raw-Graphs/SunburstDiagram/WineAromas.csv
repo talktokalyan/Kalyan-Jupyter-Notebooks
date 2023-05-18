@@ -1,0 +1,40 @@
+Root,Level 1,Level 2,Level 3,results
+Aromas,Floral,Other,,1578500
+Aromas,Floral,Orange Blossom,,35300000
+Aromas,Fruits Red Wine,Red Berries,Berries,3107900
+Aromas,Fruits Red Wine,Tree Fruits,Cherry,2400000
+Aromas,Fruits Red Wine,Tree Fruits,Plum,945000
+Aromas,Fruits White Wine,Citrus,Grapefruit,712000
+Aromas,Fruits White Wine,Citrus,Lemon,5040000
+Aromas,Fruits White Wine,Citrus,Lime,2920000
+Aromas,Fruits White Wine,Tree Fruits,,3687000
+Aromas,Fruits White Wine,Tropical Fruits,,3773000
+Aromas,Vegetal,Fresh Herbs,Cut Grass,34400000
+Aromas,Vegetal,Fresh Herbs,Dill,1130000
+Aromas,Vegetal,Fresh Herbs,Mint,1860000
+Aromas,Vegetal,Fresh Herbs,Thyme,1860000
+Aromas,Vegetal,Leaves,Blackcurrant Leaf,34200000
+Aromas,Vegetal,Leaves,Eucalyptus,80100
+Aromas,Vegetal,Vegetables,Green Pepper,34800000
+Aromas,Vegetal,Vegetables,Tomato,3980000
+Bouquet,Aged Wine,,,4510600
+Bouquet,Late Harvest / Botrytis,Dry Apricot,,34200000
+Bouquet,Late Harvest / Botrytis,Orange Peel,,34900000
+Bouquet,Malolactic Ferm.,Butter,,5880000
+Bouquet,Oak Aging,Coffee,,160000
+Bouquet,Oak Aging,Nuts,Almond,1860000
+Bouquet,Oak Aging,Nuts,Coconut,2690000
+Bouquet,Oak Aging,Nuts,Hazelnut,429000
+Bouquet,Oak Aging,Smoked,,2290000
+Bouquet,Oak Aging,Toast,,2620000
+Bouquet,Oak Aging,Woods,Cedar,383000
+Bouquet,Oak Aging,Woods,Oak,234000
+Bouquet,Oak Aging,Woods,Pine,943000
+Bouquet,Oak Aging,Woods,Sandalwood,44700
+Bouquet,Yeast,Bread,,5600000
+Faults,Brett,Ethyl-phenol,Old band-aid,34200000
+Faults,Sulfides,Dimethyl Sulfide,Sweet Corn,35600000
+Faults,Sulfides,Ethyl Mercaptan,Onion,4740000
+Faults,Sulfides,Hudrogen Sulfide,Rotten Egg,34300000
+Faults,Volatile Acidity,Acetic Acid,Vinegar,3470000
+Faults,Volatile Acidity,Ethyl Acetate,Nail Polish Remover,34500000

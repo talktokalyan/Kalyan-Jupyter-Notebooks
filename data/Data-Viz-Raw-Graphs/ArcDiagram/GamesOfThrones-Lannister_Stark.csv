@@ -1,0 +1,25 @@
+Source,Target,weight,id
+Arya Stark,Cersei Lannister,25,304
+Arya Stark,Jaime Lannister,13,321
+Arya Stark,Tyrion Lannister,11,364
+Arya Stark,Tywin Lannister,13,365
+Benjen Stark,Cersei Lannister,3,553
+Benjen Stark,Tyrion Lannister,8,562
+Bran Stark,Cersei Lannister,6,631
+Bran Stark,Stafford Lannister,3,670
+Bran Stark,Tyrion Lannister,31,674
+Catelyn Stark,Cersei Lannister,30,800
+Catelyn Stark,Jaime Lannister,59,814
+Catelyn Stark,Stafford Lannister,3,851
+Catelyn Stark,Tyrion Lannister,69,856
+Catelyn Stark,Tywin Lannister,21,858
+Eddard Stark,Jaime Lannister,33,1309
+Eddard Stark,Tyrion Lannister,40,1347
+Eddard Stark,Tywin Lannister,18,1348
+Rickon Stark,Tyrion Lannister,4,2601
+Robb Stark,Stafford Lannister,5,2613
+Robb Stark,Tyrion Lannister,44,2621
+Robb Stark,Tywin Lannister,30,2622
+Robb Stark,Willem Lannister,3,2628
+Sansa Stark,Tyrion Lannister,118,2703
+Sansa Stark,Tywin Lannister,6,2705
