@@ -1,0 +1,36 @@
+parameter,state_code,state_name,sample_value,state
+74,1,Jammu & Kashmir,1,JAMMU & KASHMIR
+54,2,Himachal Pradesh,2,HIMACHAL PRADESH
+65,3,Punjab,3,PUNJAB
+54,4,Chandigarh,4,CHANDIGARH
+85,5,Uttarkhand,5,UTTARKHAND
+23,6,Haryana,6,HARYANA
+20,7,NCT of Delhi,7,NCT OF DELHI
+24,8,Rajasthan,8,RAJASTHAN
+94,9,Uttar Pradesh,9,UTTAR PRADESH
+96,10,Bihar,10,BIHAR
+11,11,Sikkim,1,SIKKIM
+12,12,Arunachal Pradesh,2,ARUNACHAL PRADESH
+13,13,Nagaland,3,NAGALAND
+55,14,Manipur,4,MANIPUR
+54,15,Mizoram,5,MIZORAM
+68,16,Tripura,6,TRIPURA
+45,17,Meghalaya,7,MEGHALAYA
+72,18,Assam,8,ASSAM
+17,19,West Bengal,9,WEST BENGAL
+38,20,Jharkhand,10,JHARKHAND
+15,21,Odisha,1,ODISHA
+44,22,Chhattisgarh,2,CHHATTISGARH
+37,23,Madhya Pradesh,3,MADHYA PRADESH
+16,24,Gujarat,4,GUJARAT
+16,25,Daman and Diu,5,DAMAN AND DIU
+39,26,Dadra & Nagar Haveli,6,DADRA & NAGAR HAVELI
+64,27,Maharashtra,7,MAHARASHTRA
+28,37,Andhra Pradesh,8,ANDHRA PRADESH
+43,29,Karnataka,9,KARNATAKA
+69,30,Goa,10,GOA
+7,31,Lakshadweep,1,LAKSHADWEEP
+44,32,Kerala,2,KERALA
+163,33,Tamil Nadu,3,TAMIL NADU
+87,34,Pondicherry,4,PONDICHERRY
+162,35,Andaman and Nicobar Islands,5,ANDAMAN AND NICOBAR ISLANDS
