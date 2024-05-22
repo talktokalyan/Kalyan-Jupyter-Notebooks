@@ -8,7 +8,7 @@
 # District Data
 1. Create india_2011_district-V2.json by copying data/shapefiles-master/india/districts/india_2011_district.json
 2. Create india_state-V2.json by copying data/shapefiles-master/india/state_ut/india_state.json
-3. Corrections to the State and UT Names as follows
+3. Correct State and UT Names are as follows
     Andaman and Nicobar Islands
     Andhra Pradesh
     Arunachal Pradesh

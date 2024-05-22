@@ -6658,7 +6658,7 @@
       },
       "properties": {
         "ST_NAME": "AP",
-        "PC_NAME": "Amlapuram",
+        "PC_NAME": "Amalapuram",
         "ST_CODE": "S01",
         "PC_CODE": 24,
         "Res": "SC"
@@ -17443,7 +17443,7 @@
         "ST_NAME": "AS",
         "PC_NAME": "Lakhimpur",
         "ST_CODE": "S03",
-        "PC_CODE": 14,
+        "PC_CODE": 12,
         "Res": "GEN"
       }
     },
@@ -18037,7 +18037,7 @@
         "ST_NAME": "AS",
         "PC_NAME": "Jorhat",
         "ST_CODE": "S03",
-        "PC_CODE": 12,
+        "PC_CODE": 14,
         "Res": "GEN"
       }
     },
@@ -18352,9 +18352,9 @@
       },
       "properties": {
         "ST_NAME": "AS",
-        "PC_NAME": "Tezpur",
+        "PC_NAME": "Sonitpur",
         "ST_CODE": "S03",
-        "PC_CODE": 9,
+        "PC_CODE": 11,
         "Res": "GEN"
       }
     },
@@ -18833,9 +18833,9 @@
       },
       "properties": {
         "ST_NAME": "AS",
-        "PC_NAME": "Kaliabor",
+        "PC_NAME": "Kaziranga",
         "ST_CODE": "S03",
-        "PC_CODE": 11,
+        "PC_CODE": 10,
         "Res": "GEN"
       }
     },
@@ -19082,9 +19082,9 @@
       },
       "properties": {
         "ST_NAME": "AS",
-        "PC_NAME": "Mangaldoi",
+        "PC_NAME": "Darrang-Udalguri",
         "ST_CODE": "S03",
-        "PC_CODE": 8,
+        "PC_CODE": 4,
         "Res": "GEN"
       }
     },
@@ -19393,7 +19393,7 @@
         "ST_NAME": "AS",
         "PC_NAME": "Nagaon",
         "ST_CODE": "S03",
-        "PC_CODE": 10,
+        "PC_CODE": 9,
         "Res": "GEN"
       }
     },
@@ -19968,9 +19968,9 @@
       },
       "properties": {
         "ST_NAME": "AS",
-        "PC_NAME": "Autonomous District",
+        "PC_NAME": "Diphu",
         "ST_CODE": "S03",
-        "PC_CODE": 3,
+        "PC_CODE": 6,
         "Res": "ST"
       }
     },
@@ -20283,7 +20283,7 @@
         "ST_NAME": "AS",
         "PC_NAME": "Dhubri",
         "ST_CODE": "S03",
-        "PC_CODE": 4,
+        "PC_CODE": 2,
         "Res": "GEN"
       }
     },
@@ -20456,7 +20456,7 @@
         "ST_NAME": "AS",
         "PC_NAME": "Karimganj",
         "ST_CODE": "S03",
-        "PC_CODE": 1,
+        "PC_CODE": 7,
         "Res": "SC"
       }
     },
@@ -20673,7 +20673,7 @@
         "ST_NAME": "AS",
         "PC_NAME": "Silchar",
         "ST_CODE": "S03",
-        "PC_CODE": 2,
+        "PC_CODE": 8,
         "Res": "GEN"
       }
     },
@@ -21050,7 +21050,7 @@
         "ST_NAME": "AS",
         "PC_NAME": "Kokrajhar",
         "ST_CODE": "S03",
-        "PC_CODE": 5,
+        "PC_CODE": 1,
         "Res": "ST"
       }
     },
@@ -21427,7 +21427,7 @@
         "ST_NAME": "AS",
         "PC_NAME": "Guwahati",
         "ST_CODE": "S03",
-        "PC_CODE": 7,
+        "PC_CODE": 5,
         "Res": "GEN"
       }
     },
@@ -21716,7 +21716,7 @@
         "ST_NAME": "AS",
         "PC_NAME": "Barpeta",
         "ST_CODE": "S03",
-        "PC_CODE": 6,
+        "PC_CODE": 3,
         "Res": "GEN"
       }
     },
@@ -36139,7 +36139,7 @@
       },
       "properties": {
         "ST_NAME": "DD",
-        "PC_NAME": "Daman & Diu",
+        "PC_NAME": "Daman and Diu",
         "ST_CODE": "U04",
         "PC_CODE": 1,
         "Res": "GEN"
@@ -40770,7 +40770,7 @@
       },
       "properties": {
         "ST_NAME": "GJ",
-        "PC_NAME": "Dohad",
+        "PC_NAME": "Dahod",
         "ST_CODE": "S06",
         "PC_CODE": 19,
         "Res": "ST"
@@ -95557,7 +95557,7 @@
       },
       "properties": {
         "ST_NAME": "MH",
-        "PC_NAME": "Biwandi",
+        "PC_NAME": "Bhiwandi",
         "ST_CODE": "S13",
         "PC_CODE": 23,
         "Res": "GEN"
@@ -104300,7 +104300,7 @@
       },
       "properties": {
         "ST_NAME": "OD",
-        "PC_NAME": "Baleshwar",
+        "PC_NAME": "Balasore",
         "ST_CODE": "S18",
         "PC_CODE": 6,
         "Res": "GEN"
@@ -132188,7 +132188,7 @@
       },
       "properties": {
         "ST_NAME": "TN",
-        "PC_NAME": "Nagappattinam",
+        "PC_NAME": "Nagapattinam",
         "ST_CODE": "S22",
         "PC_CODE": 29,
         "Res": "SC"
@@ -143261,7 +143261,7 @@
       },
       "properties": {
         "ST_NAME": "UP",
-        "PC_NAME": "Budaun",
+        "PC_NAME": "Badaun",
         "ST_CODE": "S24",
         "PC_CODE": 23,
         "Res": "GEN"
@@ -167397,7 +167397,7 @@
       },
       "properties": {
         "ST_NAME": "WB",
-        "PC_NAME": "Koch Bihar",
+        "PC_NAME": "Coochbehar",
         "ST_CODE": "S25",
         "PC_CODE": 1,
         "Res": "SC"
@@ -168112,7 +168112,7 @@
       },
       "properties": {
         "ST_NAME": "WB",
-        "PC_NAME": "Barakpur",
+        "PC_NAME": "Barrackpur",
         "ST_CODE": "S25",
         "PC_CODE": 15,
         "Res": "GEN"
@@ -168213,7 +168213,7 @@
       },
       "properties": {
         "ST_NAME": "WB",
-        "PC_NAME": "Haora",
+        "PC_NAME": "Howrah",
         "ST_CODE": "S25",
         "PC_CODE": 25,
         "Res": "GEN"
@@ -168539,7 +168539,7 @@
       },
       "properties": {
         "ST_NAME": "WB",
-        "PC_NAME": "Hugli",
+        "PC_NAME": "Hooghly",
         "ST_CODE": "S25",
         "PC_CODE": 28,
         "Res": "GEN"
@@ -168676,7 +168676,7 @@
       },
       "properties": {
         "ST_NAME": "WB",
-        "PC_NAME": "Shrirampur",
+        "PC_NAME": "Sreerampur",
         "ST_CODE": "S25",
         "PC_CODE": 27,
         "Res": "GEN"
