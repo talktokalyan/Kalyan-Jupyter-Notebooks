@@ -1,3 +1,8 @@
+# Baseline GeoJSON are obtained from
+1. HTMediaLabs GitHub
+2. 
+
+
 
 # Important Info
 1. Districts can have multiple Parliamentary Constituencies
