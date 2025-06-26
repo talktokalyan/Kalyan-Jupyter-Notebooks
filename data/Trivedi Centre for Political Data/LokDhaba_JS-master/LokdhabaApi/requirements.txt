@@ -1,0 +1,8 @@
+flask
+flask-cors
+mysql-connector-python
+pandas
+geopandas
+simplejson
+spaCy == 2.2
+gunicorn<20

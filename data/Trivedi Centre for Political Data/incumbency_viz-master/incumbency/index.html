@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Political Career Tracker</title>
+    <meta http-equiv='cache-control' content='no-cache'>
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
+    <script type="text/javascript" src="assets/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/randomColor.min.js"></script>
+    <script data-require="d3@4.0.0" data-semver="4.0.0" src="assets/d3.v4.min.js"></script>
+    <script type="text/javascript" src="assets/d3-legend.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="assets/GE.css">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro|Montserrat" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+    <!--script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        $(window).on('load',function(){
+            $('#PopUp').modal('show');
+        });
+    </script-->
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Political Career Tracker</h1>
+        <h2><span class="assembly-number"></span> <span class = "assembly-name"></span> <span class="year-of-election"></span></h2>
+
+        <div class="help">
+            <!-- Trigger/Open The PopUp -->
+            <div class="pubtnd">
+            <p>Political Career Tracker (PCT) is an online tool developed by the <a href="https://tcpd.ashoka.edu.in" target="_blank" class="pubtna">Trivedi Centre of Political Data</a> to track the political careers of candidates who have contested in any Central or State level Election in India since 1962.</p>
+            <a id="PopUpBtn" class=pubtna>Click here</a> to know more about this visualisation. 
+            <br><a href=#footer class="pubtna">Scroll to the bottom</a> for resources.
+            </div>
+
+            <!-- The PopUp -->
+            <div id="PopUp" class="modal" role="dialog" >
+              <!-- PopUp content -->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <span class="close">&times;</span>
+                  <h2>About this Visualisation</h2>
+                </div>
+                <div class="modal-body">
+                  <ol>
+                    <li>Each box represents an MP / MLA contesting in the elections to the Legislative House. </li>
+                    <li>Squares indicate winners and circles indicate candidates who lost. </li>
+                    <li>The colour of the box indicates the previous party of the MP, or the current party affiliation for first-time contesters. </li>
+                    <!--<li>For convenience of viewing, this tool does not display non-winning independent candidates.</li>-->
+                    <li>Candidates who came 1st or 2nd, but are not from a major party are put collectively in "Other Parties"</li>
+                    <li>To search for a person or constituency, type the name in the search box.</li>
+                    <li>The House and Assembly Number are to be selected by the user. </li>
+                    <li>Change the Label settings to change the number displayed in each candidate box, like Total Number of Assemblies which a candidate has contested or won.</li>
+                    <li>You can change the Position setting to "All candidates" instead of "Winners". </li>
+                    <li>Hover on a box to see more details such as constituency, assembly number, year and position.
+                      <ul>
+                        <li>Each entry in the pop-up box, starting from the left, is to be read as follows - Constituency (Assembly Number, Year of Election) Party, Position.</li>
+                        <li>So for example, CHINDWARA(16a, 2014) INC, #1 is to be read as:
+                          <ul>
+                            <li>The constituency is Chindwara</li>
+                            <li>The election was held in the 16th Assembly</li>
+                            <li>The election was held in the year 2014</li>
+                            <li>The candidate ran on a ticket from the party INC</li>
+                            <li>The candidate placed #1 in the election</li>
+                          </ul>
+                        </li>
+                        <li>Unsuccessful attempts are shown in grey. </li>
+                      </ul>
+                        </li>
+                    <li>Independent candidates are marked "IND".</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+            <br>
+        </div>
+
+        <div class="controls">
+
+            <div class="input-container">
+                <label for="search">Search</label>
+                <a class="infotooltip show_hide" href="#">
+                <img class="static" src="https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg" alt="(i)" height="13" width="13"/>
+                <!--https://icon-library.net/images/italics-icon/italics-icon-13.jpg, https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg-->
+                <span class="custom info">
+                    <!--em>State</em-->Please note that this is spelling-sensitive so the results will vary according to what is typed in the search box.
+                </span>
+                </a>
+                <input autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="height:25px"
+                type='text' class="select-search" id='search' placeholder="Person, constituency or party">
+            </div>
+
+            <div class="input-container">
+                <label>House</label>
+                <a class="infotooltip" href="#">
+                <img class="static" src="https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg" alt="(i)" height="13" width="13"/>
+                <!--https://icon-library.net/images/italics-icon/italics-icon-13.jpg, https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg-->
+                <span class="custom info">
+                    <!--em>State</em-->Choose either Lok Sabha (Parliament) or Vidhan Sabha (State Assembly)
+                </span>
+                </a>
+                <select id= "house">
+                </select>
+            </div>
+
+            <div class="input-container">
+                <label>State/UT</label>
+                <a class="infotooltip" href="#">
+                <img class="static" src="https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg" alt="(i)" height="13" width="13"/>
+                <!--https://icon-library.net/images/italics-icon/italics-icon-13.jpg, https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg-->
+                <span class="custom info">
+                    <!--em>State</em-->Select State/UT
+                </span>
+                </a>
+                <select id= "assembly">
+                </select>
+            </div>
+
+
+            <div class="input-container">
+                <label for="assemblies">Assembly #</label>
+                <a class="infotooltip" href="#">
+                <img class="static" src="https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg" alt="(i)" height="13" width="13"/>
+                <!--https://icon-library.net/images/italics-icon/italics-icon-13.jpg, https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg-->
+                <span class="custom info">
+                    <!--em>State</em-->Select the term of the Legislative House that you want to see.<br> This is displayed on hover with an 'a' suffix.
+                </span>
+                </a>
+                <select id="assemblies">
+                </select>
+            </div>
+            <div class="input-container">
+                <label for="bye">Election Type</label>
+                <a class="infotooltip" href="#">
+                <img class="static" src="https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg" alt="(i)" height="13" width="13"/>
+                <!--https://icon-library.net/images/italics-icon/italics-icon-13.jpg, https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg-->
+                <span class="custom info">
+                    Choose to include bye-elections or not.
+                </span>
+                </a>
+                <select class="select-bye" id="bye">
+                    <option value="ALL" selected='selected'>All Elections</option>
+                    <option value="GEN">Exclude Bye-Elections</option>
+                    <option value="BYE">Only Bye-Elections</option>
+                </select>
+            </div>
+        </div>
+        <div class="controls">
+
+            <div class="input-container">
+                <label for="label">Label</label>
+                <a class="infotooltip" href="#">
+                <img class="static" src="https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg" alt="(i)" height="13" width="13"/>
+                <!--https://icon-library.net/images/italics-icon/italics-icon-13.jpg, https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg-->
+                <span class="custom info">
+                    Select the variable that is seen in the candidate box.<br><br>
+                    <em><b>No label</b></em> : No number is displayed in the candidate squares below<br><br>
+                    <em><b>Assemblies Won</b></em> : The total number of <b>unique assemblies</b> in which a candidate has won <br><br>
+                    <em><b>Assemblies Contested</b></em> : The total number of <b>unique assemblies</b> in which a candidate has stood for election
+                </span>
+                </a>
+                <select class="select-label" id="label">
+                    <option value="NO_LABEL">No label</option>
+                    <option value="TIMES_WON" selected='selected'>Assemblies Won</option>
+                    <option value="TIMES_CONTESTED">Assemblies Contested</option>
+                </select>
+            </div>
+
+            <div class="input-container">
+                <label for="wonlost">Position</label>
+                <a class="infotooltip" href="#">
+                <img class="static" src="https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg" alt="(i)" height="13" width="13"/>
+                <!--https://icon-library.net/images/italics-icon/italics-icon-13.jpg, https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg-->
+                <span class="custom info">
+                    <!--em>State</em-->Choose to display <em><b>Only Winners</b></em> or <em><b>All Candidates</b></em>. A winning candidate is displayed as a square, and a losing candidate is displayed in a circle.
+                </span>
+                </a>
+                <select class="select-wonlost" id="wonlost">
+                    <option value="1" selected = "selected" >Only winners</option>
+                    <option value="2">All candidates</option>
+                    <!--<option value=2>Lost</option>-->
+                </select>
+            </div>
+
+            <div class="input-container">
+                <label sfor="turncoats">Electoral Experience</label>
+                <a class="infotooltip" href="#">
+                <img class="static" src="https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg" alt="(i)" height="13" width="13"/>
+                <!--https://icon-library.net/images/italics-icon/italics-icon-13.jpg, https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg-->
+                <span class="custom info">
+                    Filter for candidates based on their political history.<br><br>
+                    <em><b>Newcomers</b></em> :  Contested elections for the first time<br><br>
+                    <em><b>Rerunning Incumbents</b></em> :  Sitting MP/MLAs at the time of elections<br><br>
+                    <em><b>Previously Contested</b></em> :  Contested at least once before (candidates who are not newcomers)<br><br>
+                    <em><b>Stable political class</b></em> : Candidates who have served more than two terms<br><br>
+                    <em><b>Turncoats</b></em> :  Candidates who contested earlier from a different party.
+                </span>
+                </a>
+                <select class="select-turncoats" id="turncoats">
+                    <option value="ALL" selected='selected'>All</option>
+                    <option value="FIRST_TIME_MLAS">First Time Elected</option>
+                    <option value="NEWCOMERS">First Time Contestants</option>
+                    <option value="INCUMBENTS">Rerunning Incumbents</option>
+                    <option value="PREVIOUSLY_CONTESTED">Previously Contested</option>
+                    <option value="STABLE_POLITICAL_CLASS">Stable political class</option>
+                    <option value="TURNCOATS">Turncoats</option>
+                </select>
+            </div>
+
+            <div class="input-container">
+                <label for="Sex">Gender</label>
+                <a class="infotooltip" href="#">
+                <img class="static" src="https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg" alt="(i)" height="13" width="13"/>
+                <!--https://icon-library.net/images/italics-icon/italics-icon-13.jpg, https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg-->
+                <span class="custom info">
+                    <!--em>State</em-->Filter candidates by gender
+                </span>
+                </a>
+                <select class="select-sex" id="sex">
+                    <option value="ALL" selected='selected'>All</option>
+                    <option value="FEMALE">Female</option>
+                    <option value="MALE">Male</option>
+                    <option value="OTHER">Other</option>
+                </select>
+            </div>
+
+            <div class="input-container">
+                <label for="Res">Constituency Type</label>
+                <a class="infotooltip" href="#">
+                <img class="static" src="https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg" alt="(i)" height="13" width="13"/>
+                <!--https://icon-library.net/images/italics-icon/italics-icon-13.jpg, https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg-->
+                <span class="custom info">
+                    <!--em>State</em-->Filter by reserveration of constituency
+                </span>
+                </a>
+                <select class="select-res" id="res">
+                    <option value="ALL" selected='selected'>All</option>
+                    <option value="GEN">General</option>
+                    <option value="SC">SC</option>
+                    <option value="ST">ST</option>
+                </select>
+            </div>
+
+        </div>
+        <!--div class="seat-info">
+            <span class = "totalWinners"></span>
+            <a class="infotooltip" href="#">
+                <img class="static" src="https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg" alt="(i)" height="13" width="13"/>
+                <span class="custom info">
+                </span>
+                </a>
+        </div-->
+
+      <div id="Seats" align="center" >
+        <br>
+        <span class = "totalSeats"></span><br>
+        <span class = "totalWinners"></span>
+        <!--a class="infotooltip" href="#">
+            <img class="static" src="https://upload.wikimedia.org/wikipedia/commons/2/25/Info_icon-72a7cf.svg" alt="(i)" height="13" width="13"/>
+            <span class="custom info">
+                This information is calculated on the selected filters.
+            </span>
+        </a-->
+        <br>
+        <br>
+      </div>
+
+        <div id="viz" align="center">
+          <div class="tooltip" style="opacity:0"></div>
+        </div>
+        <div class="footer" id = "footer">
+          <a id = "browselink" class="pubtna" href=''>Browse/download detailed results</a>
+          || <a id = "codebooklink" target="_blank" class="pubtna" href='data/2022Jan31PCTCodebook_2_1.pdf'>Documentation</a>
+          || <a id = "feedbackLink" target="_blank" class="pubtna" href='https://forms.gle/SGfhSYfaf15GPiUo6'>Feedback Form</a>
+          <!-- <br /><a id ="downloadlink" href=''>Download visualization data</a> -->
+	  <!--  <hr />Visualization originally developed by Shivangi Tikekar and Sudheendra Hangal.-->
+            <hr> &copy; <a target="_blank" href="//tcpd.ashoka.edu.in" class="pubtna">Trivedi Centre for Political Data</a>, <a
+                target="_blank" href="//ashoka.edu.in" class="pubtna">Ashoka University</a>
+            <br />
+        </div>
+</body>
+<script src="assets/visualization.js"></script>
+
+</html>

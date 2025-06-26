@@ -1,0 +1,9 @@
+version: "2"
+services:
+  result:
+    build: .
+    container_name : incumbency
+    volumes :
+      - './incumbency:/incumbency'
+    ports:
+      - "7000:7000"
