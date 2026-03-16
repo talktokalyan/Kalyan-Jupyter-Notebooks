@@ -1,0 +1,31 @@
+Identifier,Response,Web Search Sources,Time Taken,Input Tokens,Reasoning Tokens,Output Tokens,Reasoning Effort,Error Log,Response IDs,Successful
+aa15235d_batch0,"[""{\n\t\""conservatism\"": 76,\n\t\""populism\"": 34\n}""]",,7.479952096939087,1693,448,516,,[],['resp_0fd09b1acf8b942c0069a81846cc448190bcd6563ab45d8785'],True
+57004c56_batch0,"[""{\n\t\""conservatism\"": 44,\n\t\""populism\"": 62\n}""]",,8.633436918258667,4614,576,644,,[],['resp_0b37061f9d6bcfd10069a81846ca108198b60fb022e5fd8d45'],True
+50492a6c_batch0,"[""{\n  \""conservatism\"": 94,\n  \""populism\"": 58\n}""]",,8.963817834854126,6186,576,644,,[],['resp_0b840b1296f761980069a81846ceac8194a641c2a5d88de19f'],True
+d0e93f5e_batch0,"[""{\n\t\""conservatism\"": 88,\n\t\""populism\"": 62\n}""]",,9.503633975982666,12430,448,496,,[],['resp_04b7d83a23f0e90c0069a818474e988197a906982d4b259ef8'],True
+e0c703ec_batch0,"[""{\n  \""populism\"": 78,\n  \""conservatism\"": 92\n}""]",,8.642202138900757,4946,448,478,,[],['resp_0978ee4e9c5d22290069a818484b948197aef9a0d560d19ecd'],True
+f11b7b4d_batch0,"[""{\n  \""populism\"": 38,\n  \""conservatism\"": 22\n}""]",,10.238497972488403,6572,576,628,,[],['resp_0d2adac796116cbf0069a81846c9f88198bf99ca30c89b9b9f'],True
+c3cfa36a_batch0,"[""{\n  \""conservatism\"": 72,\n  \""populism\"": 36\n}""]",,10.24879789352417,26439,448,518,,[],['resp_0b230e80e104ba5a0069a81846e1f8819690c1721f13846c98'],True
+c6e1ffce_batch0,"[""{\n  \""populism\"": 58,\n  \""conservatism\"": 18\n}""]",,8.183159112930298,4126,384,456,,[],['resp_08c03e8a7051553c0069a81849de70819bb23cdb219d5a4c4f'],True
+256801d6_batch0,"[""{\n  \""conservatism\"": 68,\n  \""populism\"": 10\n}""]",,8.767327070236206,10648,576,624,,[],['resp_02104cf0abdf52140069a81848d4a0819bb58cec0437bd862d'],True
+ef7d4284_batch0,"[""{\n  \""populism\"": 65,\n  \""conservatism\"": 72\n}""]",,11.081087112426758,6321,704,740,,[],['resp_03504af474f0ea400069a81846ce94819ba917cb2e63092550'],True
+7452c3c8_batch0,"[""{\n\t\""populism\"": 35,\n\t\""conservatism\"": 30\n}""]",,12.216705083847046,3530,832,874,,[],['resp_012657872c5209cb0069a81846d0f881908b029b2a4a7ef1e5'],True
+7093a206_batch0,"[""{\n  \""populism\"": 18,\n  \""conservatism\"": 82\n}""]",,12.494699716567993,7016,704,776,,[],['resp_0fd2107c165a54ce0069a81846cd44819a8c09d03d9a8f1254'],True
+5fbf744c_batch0,"[""{\n\t\""conservatism\"": 68,\n\t\""populism\"": 42\n}""]",,11.846126079559326,4200,768,827,,[],['resp_0dbfa389317a90eb0069a81847c5988193af03b66a22690a7d'],True
+2f926b27_batch0,"[""{\n  \""conservatism\"": 72,\n  \""populism\"": 22\n}""]",,6.835241317749023,8491,384,460,,[],['resp_06913580c6ca1eb10069a8184f65e0819baacc9d37cde82bc6'],True
+96be3758_batch0,"[""{\n  \""populism\"": 33,\n  \""conservatism\"": 78\n}""]",,15.999570846557617,23435,960,997,,[],['resp_0c1f84005c405d220069a81846fc288195a4cbaba38c63b0a4'],True
+3b77f34c_batch0,"[""{\n\t\""populism\"": 68,\n\t\""conservatism\"": 83\n}""]",,13.487643957138062,25171,704,760,,[],['resp_0efdb55ca94ea6030069a81849f32c81908dddf82c4e2d2b2f'],True
+2f3e5188_batch0,"[""{\n\t\""populism\"": 38,\n\t\""conservatism\"": 34\n}""]",,10.345831155776978,27306,576,643,,[],['resp_03afceedcf7780cb0069a8184e90b88193b1c704fedccf7195'],True
+dd2a0120_batch0,"[""{\n  \""populism\"": 60,\n  \""conservatism\"": 35\n}""]",,8.344397068023682,31623,512,568,,[],['resp_06fc27e87293417d0069a81850f7e48198871a20eb373b5ff2'],True
+6f887208_batch0,"[""{\n\t\""conservatism\"": 88,\n\t\""populism\"": 74\n}""]",,9.773563861846924,2855,448,505,,[],['resp_0bc9dcb5a1127ab30069a8184fdee88194bc11e0cd5b6145f2'],True
+101cb9f8_batch0,"[""{\n  \""populism\"": 45,\n  \""conservatism\"": 35\n}""]",,8.163347959518433,4315,576,611,,[],['resp_03fc65620e00b19b0069a81851c32081988c19fde4a1b24e8e'],True
+1989c6eb_batch0,"[""{\n  \""populism\"": 25,\n  \""conservatism\"": 72\n}""]",,8.515989780426025,11906,576,644,,[],['resp_0b4370462be443550069a81852fc548197bf02b776a4739af5'],True
+8b5f3a7c_batch0,"[""{\n  \""populism\"": 12,\n  \""conservatism\"": 78\n}""]",,10.568902969360352,2743,512,553,,[],['resp_067390322d0281180069a818517394819aa4e4befcbb0c520d'],True
+1501be28_batch0,"[""{\n  \""conservatism\"": 75,\n  \""populism\"": 40\n}""]",,9.15652084350586,13477,576,603,,[],['resp_0d4dc1d9ad2d714c0069a81853a2688193926370e4512bc6ee'],True
+5d3d79df_batch0,"[""{\n  \""populism\"": 82,\n  \""conservatism\"": 78\n}""]",,12.637559652328491,14176,640,729,,[],['resp_032e256581ed56da0069a81850be6481988792eab9ce8f8912'],True
+6317e903_batch0,"[""{\n  \""conservatism\"": 74,\n  \""populism\"": 18\n}""]",,12.126141786575317,8392,832,863,,[],['resp_022f47cd3e83f78b0069a818515d34819b98fae9ab37215d82'],True
+3002cd89_batch0,"[""{\n  \""conservatism\"": 85,\n  \""populism\"": 25\n}""]",,12.639801025390625,2016,640,710,,[],['resp_0603d9b6da86079f0069a818512d8c819b8077e4b9d30a4912'],True
+323c5b64_batch0,"[""{\n\t\""conservatism\"": 82,\n\t\""populism\"": 58\n}""]",,7.153639793395996,6996,384,434,,[],['resp_0b599be332cf47620069a81856cff08199ad99e13f06582118'],True
+be8a322e_batch0,"[""{\n  \""populism\"": 34,\n  \""conservatism\"": 75\n}""]",,10.699780941009521,5380,640,680,,[],['resp_03b070f9cb3cfca40069a81853300c8194a5ba3e999257bdb0'],True
+4255acdc_batch0,"[""{\n\t\""populism\"": 35,\n\t\""conservatism\"": 85\n}""]",,8.118438005447388,8231,448,511,,[],['resp_0d5340d5eb04ff910069a8185630ac81999dcd0802d88f7bd4'],True
+b58e84a7_batch0,"[""{\n\t\""conservatism\"": 74,\n\t\""populism\"": 63\n}""]",,13.733212947845459,2875,768,817,,[],['resp_00b9ce0be15ca76b0069a81850ec50819a97fee917df2028a5'],True

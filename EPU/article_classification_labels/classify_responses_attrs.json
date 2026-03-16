@@ -1,0 +1,9 @@
+{
+  "world": "Headline is a world/global news story",
+  "sports": "The article from the headline is about sports",
+  "sci/tech": "The headline is for an article about science or technology",
+  "business": "The article is about business",
+  "politics": "The article is about politics",
+  "regulation": "The article is about government regulation",
+  "regional": "The article is about a State or District or city in India"
+}

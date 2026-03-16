@@ -1,0 +1,8 @@
+{
+  "factual": "How much the text centers on jobs, projects, deadlines, meetings, or professional goals (0 = not about work, 100 = entirely about work).",
+  "optimism": "How positive and forward-looking the text feels (near 0 = pessimistic/hopeless, near 100 = highly hopeful and upbeat).",
+  "anger": "How much frustration, irritation, or hostility is expressed (near 0 = none, 100 = very angry).",
+  "neutral": "How formal, structured, and professional the language is (near 0 = very casual/slangy, near 100 = highly formal/academic).",
+  "confidence": "How self-assured the article sounds about claims or outcomes (near 0 = doubtful/uncertain, near 100 = very certain/assertive).",
+  "stressed": "How strained, overwhelmed, or anxious the article sounds (near 0 = calm/relaxed, near 100 = extremely stressed)."
+}

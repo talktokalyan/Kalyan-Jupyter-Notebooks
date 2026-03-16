@@ -1,0 +1,6 @@
+{
+  "date": "Extract Date of the newspaper in dd/mm/yyyy date format",
+  "headline": "News headline",
+  "text": "Extract full text of the news story only and ignore subtitle, author name and date",
+  "EPU": "Set value 1 if the text of each separate news article contains at least one term from each of the three term sets. The first set is uncertain, uncertainties, or uncertainty. The second set is 'economic' or 'economy'. The third set consists of policy relevant terms such as 'regulation', 'central bank', 'monetary policy', 'policymakers', 'deficit', 'legislation', and 'fiscal policy'."
+}

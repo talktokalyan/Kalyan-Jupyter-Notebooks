@@ -1,0 +1,9 @@
+text,predicted_classes,discusses politics,news headline,discusses animals,first person perspective,focus is on gun control
+I heard that the new president instituted a law on gun control.,"[""discusses politics"", ""first person perspective"", ""focus is on gun control""]",True,False,False,True,True
+My dog decided to eat food at 3am.,"[""discusses animals"", ""first person perspective""]",False,False,True,True,False
+Congress passes amended budget for 2026,"[""discusses politics"", ""news headline""]",True,True,False,False,False
+Why are you so late for class today? Did your dog eat your homework?,"[""discusses animals""]",False,False,True,False,False
+Local activists rally outside city hall demanding climate reform.,"[""discusses politics"", ""news headline""]",True,True,False,False,False
+Scientists discover new species of frog in the Amazon rainforest.,"[""news headline"", ""discusses animals""]",False,True,True,False,False
+Breaking: Supreme Court rules on landmark case affecting digital privacy.,"[""discusses politics"", ""news headline""]",True,True,False,False,False
+I just finished reading a book that completely changed how I think about economics.,"[""first person perspective""]",False,False,False,True,False
