@@ -1,0 +1,928 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>
+CPI Hierarchy Dashboard
+</title>
+
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    background: #f5f7f8;
+    color: #263238;
+}
+
+.header {
+    height: 72px;
+    background: white;
+    border-bottom: 1px solid #dfe4e8;
+
+    padding:
+        12px 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.subtitle {
+    font-size: 11px;
+    color: #68737a;
+    margin-top: 3px;
+}
+
+.app {
+    height: calc(100vh - 72px);
+
+    display: grid;
+
+    grid-template-columns:
+        330px 1fr;
+
+    gap: 12px;
+
+    padding: 12px;
+}
+
+.sidebar {
+    background: white;
+
+    border:
+        1px solid #dfe4e8;
+
+    border-radius: 8px;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+}
+
+.sidebar-header {
+    padding: 12px;
+
+    border-bottom:
+        1px solid #e6eaed;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.tree {
+    overflow-y: auto;
+    padding: 7px;
+}
+
+.tree-row {
+    display: flex;
+    align-items: center;
+
+    min-height: 25px;
+
+    border-radius: 4px;
+
+    cursor: pointer;
+
+    padding:
+        2px 5px;
+}
+
+.tree-row:hover {
+    background: #f1f4f6;
+}
+
+.tree-row.selected {
+    background: #e8eef1;
+}
+
+.toggle {
+    width: 20px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    color: #52636b;
+}
+
+.tree-label {
+    flex: 1;
+    font-size: 11px;
+    line-height: 1.2;
+}
+
+.tree-type {
+    font-size: 7px;
+    font-weight: 700;
+    opacity: .75;
+}
+
+.tree-weight {
+    font-size: 9px;
+    color: #64748b;
+}
+
+.dashboard {
+    display: grid;
+
+    grid-template-rows:
+        auto minmax(400px, 1fr);
+
+    gap: 12px;
+
+    min-width: 0;
+}
+
+.info {
+    background: white;
+
+    border:
+        1px solid #dfe4e8;
+
+    border-radius: 8px;
+
+    padding: 12px;
+
+    display: flex;
+    gap: 25px;
+}
+
+.info-title {
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.info-small {
+    font-size: 10px;
+    color: #64748b;
+}
+
+.chart-panel {
+    background: white;
+
+    border:
+        1px solid #dfe4e8;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-header {
+    padding:
+        10px 14px;
+
+    border-bottom:
+        1px solid #e6eaed;
+}
+
+.chart-title {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.chart-subtitle {
+    font-size: 10px;
+    color: #64748b;
+}
+
+#treemap {
+    flex: 1;
+    min-height: 0;
+}
+
+.legend {
+    font-size: 9px;
+    color: #64748b;
+    padding: 6px 10px;
+    border-top: 1px solid #eef1f3;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+    <div>
+
+        <div class="title">
+            CPI Hierarchy Dashboard
+        </div>
+
+        <div class="subtitle">
+            General Index → Divisions → Groups →
+            Classes → Sub-classes → Items
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="app">
+
+
+<!-- ============================================================
+     SIDEBAR
+============================================================= -->
+
+<div class="sidebar">
+
+    <div class="sidebar-header">
+        CPI Hierarchy
+    </div>
+
+    <div id="tree"
+         class="tree">
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     DASHBOARD
+============================================================= -->
+
+<div class="dashboard">
+
+    <div class="info">
+
+        <div>
+
+            <div id="selectedName"
+                 class="info-title">
+                General Index
+            </div>
+
+            <div id="selectedCode"
+                 class="info-small">
+                A
+            </div>
+
+        </div>
+
+        <div>
+
+            <div class="info-small">
+                Nature
+            </div>
+
+            <div id="selectedNature">
+                General Index
+            </div>
+
+        </div>
+
+        <div>
+
+            <div class="info-small">
+                Level
+            </div>
+
+            <div id="selectedLevel">
+                0
+            </div>
+
+        </div>
+
+        <div>
+
+            <div class="info-small">
+                Weight
+            </div>
+
+            <div id="selectedWeight">
+                —
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="chart-panel">
+
+        <div class="chart-header">
+
+            <div class="chart-title">
+                Hierarchy Treemap
+            </div>
+
+            <div id="chartSubtitle"
+                 class="chart-subtitle">
+                Rectangle area represents share of selected parent
+            </div>
+
+        </div>
+
+        <div id="treemap">
+        </div>
+
+        <div class="legend">
+            Hover over a rectangle for details.
+            Click a rectangle to drill down.
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+
+<script>
+
+const DATA = [{"id": 0, "parent": null, "name": "General Index", "nature": "General Index", "level": 0, "code": "A", "leaf": "N", "indent": 4, "weight": 100.0, "division": ""}, {"id": 1, "parent": 0, "name": "Food and beverages", "nature": "Divisions", "level": 1, "code": "A.01", "leaf": "N", "indent": 8, "weight": 36.75311, "division": "Food and beverages"}, {"id": 2, "parent": 1, "name": "Food", "nature": "Groups", "level": 2, "code": "A.01.01", "leaf": "N", "indent": 12, "weight": 34.7777, "division": "Food and beverages"}, {"id": 3, "parent": 2, "name": "Cereals and cereal products", "nature": "Classes", "level": 3, "code": "A.01.01.01", "leaf": "N", "indent": 16, "weight": 5.94566, "division": "Food and beverages"}, {"id": 4, "parent": 3, "name": "Cereals", "nature": "Sub-classes", "level": 4, "code": "A.01.01.01.01", "leaf": "N", "indent": 20, "weight": 3.02385, "division": "Food and beverages"}, {"id": 5, "parent": 4, "name": "Rice", "nature": "Items", "level": 5, "code": "A.01.01.01.01.01", "leaf": "Y", "indent": 24, "weight": 2.01319, "division": "Food and beverages"}, {"id": 6, "parent": 4, "name": "Wheat", "nature": "Items", "level": 5, "code": "A.01.01.01.01.02", "leaf": "Y", "indent": 24, "weight": 0.76755, "division": "Food and beverages"}, {"id": 7, "parent": 4, "name": "Jowar and its products", "nature": "Items", "level": 5, "code": "A.01.01.01.01.03", "leaf": "Y", "indent": 24, "weight": 0.06223, "division": "Food and beverages"}, {"id": 8, "parent": 4, "name": "Ragi and its products", "nature": "Items", "level": 5, "code": "A.01.01.01.01.04", "leaf": "Y", "indent": 24, "weight": 0.02989, "division": "Food and beverages"}, {"id": 9, "parent": 4, "name": "Bajra and its products", "nature": "Items", "level": 5, "code": "A.01.01.01.01.05", "leaf": "Y", "indent": 24, "weight": 0.0455, "division": "Food and beverages"}, {"id": 10, "parent": 4, "name": "Maize and its products", "nature": "Items", "level": 5, "code": "A.01.01.01.01.06", "leaf": "Y", "indent": 24, "weight": 0.03647, "division": "Food and beverages"}, {"id": 11, "parent": 4, "name": "Small millets and its products", "nature": "Items", "level": 5, "code": "A.01.01.01.01.07", "leaf": "Y", "indent": 24, "weight": 0.00631, "division": "Food and beverages"}, {"id": 12, "parent": 4, "name": "Barley and its products", "nature": "Items", "level": 5, "code": "A.01.01.01.01.08", "leaf": "Y", "indent": 24, "weight": 0.00531, "division": "Food and beverages"}, {"id": 13, "parent": 4, "name": "Other cereals and products", "nature": "Items", "level": 5, "code": "A.01.01.01.01.09", "leaf": "Y", "indent": 24, "weight": 0.03032, "division": "Food and beverages"}, {"id": 14, "parent": 4, "name": "Other wheat products", "nature": "Items", "level": 5, "code": "A.01.01.01.01.10", "leaf": "Y", "indent": 24, "weight": 0.00654, "division": "Food and beverages"}, {"id": 15, "parent": 4, "name": "Rice PDS", "nature": "Items", "level": 5, "code": "A.01.01.01.01.11", "leaf": "Y", "indent": 24, "weight": 0.02018, "division": "Food and beverages"}, {"id": 16, "parent": 4, "name": "Wheat PDS", "nature": "Items", "level": 5, "code": "A.01.01.01.01.12", "leaf": "Y", "indent": 24, "weight": 0.00036, "division": "Food and beverages"}, {"id": 17, "parent": 3, "name": "Flour of cereals", "nature": "Sub-classes", "level": 4, "code": "A.01.01.01.02", "leaf": "N", "indent": 20, "weight": 0.81216, "division": "Food and beverages"}, {"id": 18, "parent": 17, "name": "Wheat atta", "nature": "Items", "level": 5, "code": "A.01.01.01.02.01", "leaf": "Y", "indent": 24, "weight": 0.76657, "division": "Food and beverages"}, {"id": 19, "parent": 17, "name": "Maida", "nature": "Items", "level": 5, "code": "A.01.01.01.02.02", "leaf": "Y", "indent": 24, "weight": 0.04346, "division": "Food and beverages"}, {"id": 20, "parent": 17, "name": "Wheat atta PDS", "nature": "Items", "level": 5, "code": "A.01.01.01.02.03", "leaf": "Y", "indent": 24, "weight": 0.00213, "division": "Food and beverages"}, {"id": 21, "parent": 3, "name": "Bread and bakery products", "nature": "Sub-classes", "level": 4, "code": "A.01.01.01.03", "leaf": "N", "indent": 20, "weight": 1.47971, "division": "Food and beverages"}, {"id": 22, "parent": 21, "name": "Biscuits", "nature": "Items", "level": 5, "code": "A.01.01.01.03.01", "leaf": "Y", "indent": 24, "weight": 0.73823, "division": "Food and beverages"}, {"id": 23, "parent": 21, "name": "Chips , nachos, puffs, wafers, etc.", "nature": "Items", "level": 5, "code": "A.01.01.01.03.02", "leaf": "Y", "indent": 24, "weight": 0.32273, "division": "Food and beverages"}, {"id": 24, "parent": 21, "name": "Cake, pastry", "nature": "Items", "level": 5, "code": "A.01.01.01.03.03", "leaf": "Y", "indent": 24, "weight": 0.21168, "division": "Food and beverages"}, {"id": 25, "parent": 21, "name": "Bread (bakery)", "nature": "Items", "level": 5, "code": "A.01.01.01.03.04", "leaf": "Y", "indent": 24, "weight": 0.20707, "division": "Food and beverages"}, {"id": 26, "parent": 3, "name": "Breakfast cereals", "nature": "Sub-classes", "level": 4, "code": "A.01.01.01.04", "leaf": "N", "indent": 20, "weight": 0.19487, "division": "Food and beverages"}, {"id": 27, "parent": 26, "name": "Breakfast cereals", "nature": "Items", "level": 5, "code": "A.01.01.01.04.01", "leaf": "Y", "indent": 24, "weight": 0.09012, "division": "Food and beverages"}, {"id": 28, "parent": 26, "name": "Muri", "nature": "Items", "level": 5, "code": "A.01.01.01.04.02", "leaf": "Y", "indent": 24, "weight": 0.08793, "division": "Food and beverages"}, {"id": 29, "parent": 26, "name": "Other rice products", "nature": "Items", "level": 5, "code": "A.01.01.01.04.03", "leaf": "Y", "indent": 24, "weight": 0.01682, "division": "Food and beverages"}, {"id": 30, "parent": 3, "name": "Macaroni, noodles, couscous and similar pasta products", "nature": "Sub-classes", "level": 4, "code": "A.01.01.01.05", "leaf": "N", "indent": 20, "weight": 0.26088, "division": "Food and beverages"}, {"id": 31, "parent": 30, "name": "Noodles", "nature": "Items", "level": 5, "code": "A.01.01.01.05.01", "leaf": "Y", "indent": 24, "weight": 0.23006, "division": "Food and beverages"}, {"id": 32, "parent": 30, "name": "Vermicelli (sewai)", "nature": "Items", "level": 5, "code": "A.01.01.01.05.02", "leaf": "Y", "indent": 24, "weight": 0.03082, "division": "Food and beverages"}, {"id": 33, "parent": 3, "name": "Other milled cereal and grain products", "nature": "Sub-classes", "level": 4, "code": "A.01.01.01.06", "leaf": "N", "indent": 20, "weight": 0.17419, "division": "Food and beverages"}, {"id": 34, "parent": 33, "name": "Suji, rawa", "nature": "Items", "level": 5, "code": "A.01.01.01.06.01", "leaf": "Y", "indent": 24, "weight": 0.08968, "division": "Food and beverages"}, {"id": 35, "parent": 33, "name": "Chidwa", "nature": "Items", "level": 5, "code": "A.01.01.01.06.02", "leaf": "Y", "indent": 24, "weight": 0.08451, "division": "Food and beverages"}, {"id": 36, "parent": 2, "name": "Meat, fresh, chilled or frozen", "nature": "Classes", "level": 3, "code": "A.01.01.02", "leaf": "N", "indent": 16, "weight": 2.51555, "division": "Food and beverages"}, {"id": 37, "parent": 36, "name": "Meat, fresh, chilled or frozen", "nature": "Sub-classes", "level": 4, "code": "A.01.01.02.01", "leaf": "N", "indent": 20, "weight": 2.51555, "division": "Food and beverages"}, {"id": 38, "parent": 37, "name": "Chicken", "nature": "Items", "level": 5, "code": "A.01.01.02.01.01", "leaf": "Y", "indent": 24, "weight": 1.57516, "division": "Food and beverages"}, {"id": 39, "parent": 37, "name": "Goat meat/ mutton", "nature": "Items", "level": 5, "code": "A.01.01.02.01.02", "leaf": "Y", "indent": 24, "weight": 0.68247, "division": "Food and beverages"}, {"id": 40, "parent": 37, "name": "Beef/ buffalo meat", "nature": "Items", "level": 5, "code": "A.01.01.02.01.03", "leaf": "Y", "indent": 24, "weight": 0.18304, "division": "Food and beverages"}, {"id": 41, "parent": 37, "name": "Pork", "nature": "Items", "level": 5, "code": "A.01.01.02.01.04", "leaf": "Y", "indent": 24, "weight": 0.0582, "division": "Food and beverages"}, {"id": 42, "parent": 37, "name": "Others: birds, crab,oyster, etc.", "nature": "Items", "level": 5, "code": "A.01.01.02.01.05", "leaf": "Y", "indent": 24, "weight": 0.01668, "division": "Food and beverages"}, {"id": 43, "parent": 2, "name": "Fish and other seafood", "nature": "Classes", "level": 3, "code": "A.01.01.03", "leaf": "N", "indent": 16, "weight": 1.02232, "division": "Food and beverages"}, {"id": 44, "parent": 43, "name": "Fish and prawn", "nature": "Sub-classes", "level": 4, "code": "A.01.01.03.01", "leaf": "N", "indent": 20, "weight": 1.02232, "division": "Food and beverages"}, {"id": 45, "parent": 44, "name": "Fish and prawn", "nature": "Items", "level": 5, "code": "A.01.01.03.01.01", "leaf": "Y", "indent": 24, "weight": 1.02232, "division": "Food and beverages"}, {"id": 46, "parent": 2, "name": "Milk, other dairy products and eggs", "nature": "Classes", "level": 3, "code": "A.01.01.04", "leaf": "N", "indent": 16, "weight": 7.28213, "division": "Food and beverages"}, {"id": 47, "parent": 46, "name": "Milk: liquid", "nature": "Sub-classes", "level": 4, "code": "A.01.01.04.01", "leaf": "N", "indent": 20, "weight": 5.25517, "division": "Food and beverages"}, {"id": 48, "parent": 47, "name": "Milk: liquid", "nature": "Items", "level": 5, "code": "A.01.01.04.01.01", "leaf": "Y", "indent": 24, "weight": 5.25517, "division": "Food and beverages"}, {"id": 49, "parent": 46, "name": "Milk: condensed/ powder", "nature": "Sub-classes", "level": 4, "code": "A.01.01.04.02", "leaf": "N", "indent": 20, "weight": 0.04758, "division": "Food and beverages"}, {"id": 50, "parent": 49, "name": "Milk: condensed/ powder", "nature": "Items", "level": 5, "code": "A.01.01.04.02.01", "leaf": "Y", "indent": 24, "weight": 0.04758, "division": "Food and beverages"}, {"id": 51, "parent": 46, "name": "Cheese", "nature": "Sub-classes", "level": 4, "code": "A.01.01.04.03", "leaf": "N", "indent": 20, "weight": 0.26846, "division": "Food and beverages"}, {"id": 52, "parent": 51, "name": "Paneer", "nature": "Items", "level": 5, "code": "A.01.01.04.03.01", "leaf": "Y", "indent": 24, "weight": 0.26567, "division": "Food and beverages"}, {"id": 53, "parent": 51, "name": "Cheese", "nature": "Items", "level": 5, "code": "A.01.01.04.03.02", "leaf": "Y", "indent": 24, "weight": 0.00279, "division": "Food and beverages"}, {"id": 54, "parent": 46, "name": "Curd, Yoghurt and similar products", "nature": "Sub-classes", "level": 4, "code": "A.01.01.04.04", "leaf": "N", "indent": 20, "weight": 0.33764, "division": "Food and beverages"}, {"id": 55, "parent": 54, "name": "Curd, yogurt", "nature": "Items", "level": 5, "code": "A.01.01.04.04.01", "leaf": "Y", "indent": 24, "weight": 0.25081, "division": "Food and beverages"}, {"id": 56, "parent": 54, "name": "Butter milk", "nature": "Items", "level": 5, "code": "A.01.01.04.04.02", "leaf": "Y", "indent": 24, "weight": 0.04791, "division": "Food and beverages"}, {"id": 57, "parent": 54, "name": "Lassi", "nature": "Items", "level": 5, "code": "A.01.01.04.04.03", "leaf": "Y", "indent": 24, "weight": 0.03892, "division": "Food and beverages"}, {"id": 58, "parent": 46, "name": "Milk-based dessert and beverages", "nature": "Sub-classes", "level": 4, "code": "A.01.01.04.05", "leaf": "N", "indent": 20, "weight": 0.87169, "division": "Food and beverages"}, {"id": 59, "parent": 58, "name": "Tea: cups", "nature": "Items", "level": 5, "code": "A.01.01.04.05.01", "leaf": "Y", "indent": 24, "weight": 0.54205, "division": "Food and beverages"}, {"id": 60, "parent": 58, "name": "Prepared sweets-milk based", "nature": "Items", "level": 5, "code": "A.01.01.04.05.02", "leaf": "Y", "indent": 24, "weight": 0.28571, "division": "Food and beverages"}, {"id": 61, "parent": 58, "name": "Coffee: cups", "nature": "Items", "level": 5, "code": "A.01.01.04.05.03", "leaf": "Y", "indent": 24, "weight": 0.04393, "division": "Food and beverages"}, {"id": 62, "parent": 46, "name": "Eggs", "nature": "Sub-classes", "level": 4, "code": "A.01.01.04.06", "leaf": "N", "indent": 20, "weight": 0.49383, "division": "Food and beverages"}, {"id": 63, "parent": 62, "name": "Eggs", "nature": "Items", "level": 5, "code": "A.01.01.04.06.01", "leaf": "Y", "indent": 24, "weight": 0.49383, "division": "Food and beverages"}, {"id": 64, "parent": 46, "name": "Other dairy products", "nature": "Sub-classes", "level": 4, "code": "A.01.01.04.07", "leaf": "N", "indent": 20, "weight": 0.00776, "division": "Food and beverages"}, {"id": 65, "parent": 64, "name": "Other milk products", "nature": "Items", "level": 5, "code": "A.01.01.04.07.01", "leaf": "Y", "indent": 24, "weight": 0.00776, "division": "Food and beverages"}, {"id": 66, "parent": 2, "name": "Oils and fats", "nature": "Classes", "level": 3, "code": "A.01.01.05", "leaf": "N", "indent": 16, "weight": 2.74291, "division": "Food and beverages"}, {"id": 67, "parent": 66, "name": "Vegetable oils", "nature": "Sub-classes", "level": 4, "code": "A.01.01.05.01", "leaf": "N", "indent": 20, "weight": 2.18473, "division": "Food and beverages"}, {"id": 68, "parent": 67, "name": "Refined oil", "nature": "Items", "level": 5, "code": "A.01.01.05.01.01", "leaf": "Y", "indent": 24, "weight": 1.04699, "division": "Food and beverages"}, {"id": 69, "parent": 67, "name": "Mustard oil", "nature": "Items", "level": 5, "code": "A.01.01.05.01.02", "leaf": "Y", "indent": 24, "weight": 0.96054, "division": "Food and beverages"}, {"id": 70, "parent": 67, "name": "Groundnut oil", "nature": "Items", "level": 5, "code": "A.01.01.05.01.03", "leaf": "Y", "indent": 24, "weight": 0.08378, "division": "Food and beverages"}, {"id": 71, "parent": 67, "name": "Coconut oil", "nature": "Items", "level": 5, "code": "A.01.01.05.01.04", "leaf": "Y", "indent": 24, "weight": 0.05788, "division": "Food and beverages"}, {"id": 72, "parent": 67, "name": "Edible oil", "nature": "Items", "level": 5, "code": "A.01.01.05.01.05", "leaf": "Y", "indent": 24, "weight": 0.01325, "division": "Food and beverages"}, {"id": 73, "parent": 67, "name": "Edible oil PDS", "nature": "Items", "level": 5, "code": "A.01.01.05.01.06", "leaf": "Y", "indent": 24, "weight": 0.02229, "division": "Food and beverages"}, {"id": 74, "parent": 66, "name": "Butter and other oils and fats derived from milk", "nature": "Sub-classes", "level": 4, "code": "A.01.01.05.02", "leaf": "N", "indent": 20, "weight": 0.55, "division": "Food and beverages"}, {"id": 75, "parent": 74, "name": "Ghee", "nature": "Items", "level": 5, "code": "A.01.01.05.02.01", "leaf": "Y", "indent": 24, "weight": 0.51801, "division": "Food and beverages"}, {"id": 76, "parent": 74, "name": "Butter", "nature": "Items", "level": 5, "code": "A.01.01.05.02.02", "leaf": "Y", "indent": 24, "weight": 0.03199, "division": "Food and beverages"}, {"id": 77, "parent": 66, "name": "Margarine and similar preparations", "nature": "Sub-classes", "level": 4, "code": "A.01.01.05.03", "leaf": "N", "indent": 20, "weight": 0.00818, "division": "Food and beverages"}, {"id": 78, "parent": 77, "name": "Vanaspati and margarine", "nature": "Items", "level": 5, "code": "A.01.01.05.03.01", "leaf": "Y", "indent": 24, "weight": 0.00818, "division": "Food and beverages"}, {"id": 79, "parent": 2, "name": "Fruits and nuts", "nature": "Classes", "level": 3, "code": "A.01.01.06", "leaf": "N", "indent": 16, "weight": 3.70144, "division": "Food and beverages"}, {"id": 80, "parent": 79, "name": "Dates, figs and tropical fruits, fresh", "nature": "Sub-classes", "level": 4, "code": "A.01.01.06.01", "leaf": "N", "indent": 20, "weight": 1.33212, "division": "Food and beverages"}, {"id": 81, "parent": 80, "name": "Banana", "nature": "Items", "level": 5, "code": "A.01.01.06.01.01", "leaf": "Y", "indent": 24, "weight": 0.46542, "division": "Food and beverages"}, {"id": 82, "parent": 80, "name": "Mango", "nature": "Items", "level": 5, "code": "A.01.01.06.01.02", "leaf": "Y", "indent": 24, "weight": 0.30646, "division": "Food and beverages"}, {"id": 83, "parent": 80, "name": "Green coconut", "nature": "Items", "level": 5, "code": "A.01.01.06.01.03", "leaf": "Y", "indent": 24, "weight": 0.13717, "division": "Food and beverages"}, {"id": 84, "parent": 80, "name": "Coconut", "nature": "Items", "level": 5, "code": "A.01.01.06.01.04", "leaf": "Y", "indent": 24, "weight": 0.19311, "division": "Food and beverages"}, {"id": 85, "parent": 80, "name": "Papaya", "nature": "Items", "level": 5, "code": "A.01.01.06.01.05", "leaf": "Y", "indent": 24, "weight": 0.1096, "division": "Food and beverages"}, {"id": 86, "parent": 80, "name": "Guava", "nature": "Items", "level": 5, "code": "A.01.01.06.01.06", "leaf": "Y", "indent": 24, "weight": 0.10104, "division": "Food and beverages"}, {"id": 87, "parent": 80, "name": "Pineapple", "nature": "Items", "level": 5, "code": "A.01.01.06.01.07", "leaf": "Y", "indent": 24, "weight": 0.01425, "division": "Food and beverages"}, {"id": 88, "parent": 80, "name": "Fig: anjeer", "nature": "Items", "level": 5, "code": "A.01.01.06.01.08", "leaf": "Y", "indent": 24, "weight": 0.00507, "division": "Food and beverages"}, {"id": 89, "parent": 79, "name": "Citrus fruits, fresh", "nature": "Sub-classes", "level": 4, "code": "A.01.01.06.02", "leaf": "N", "indent": 20, "weight": 0.28097, "division": "Food and beverages"}, {"id": 90, "parent": 89, "name": "Orange and sweet lime (mausami)", "nature": "Items", "level": 5, "code": "A.01.01.06.02.01", "leaf": "Y", "indent": 24, "weight": 0.14425, "division": "Food and beverages"}, {"id": 91, "parent": 89, "name": "Lemon", "nature": "Items", "level": 5, "code": "A.01.01.06.02.02", "leaf": "Y", "indent": 24, "weight": 0.13672, "division": "Food and beverages"}, {"id": 92, "parent": 79, "name": "Stone fruits and pome fruits, fresh", "nature": "Sub-classes", "level": 4, "code": "A.01.01.06.03", "leaf": "N", "indent": 20, "weight": 0.57766, "division": "Food and beverages"}, {"id": 93, "parent": 92, "name": "Apple", "nature": "Items", "level": 5, "code": "A.01.01.06.03.01", "leaf": "Y", "indent": 24, "weight": 0.56153, "division": "Food and beverages"}, {"id": 94, "parent": 92, "name": "Litchi", "nature": "Items", "level": 5, "code": "A.01.01.06.03.02", "leaf": "Y", "indent": 24, "weight": 0.01017, "division": "Food and beverages"}, {"id": 95, "parent": 92, "name": "Pears/ nashpati", "nature": "Items", "level": 5, "code": "A.01.01.06.03.03", "leaf": "Y", "indent": 24, "weight": 0.00485, "division": "Food and beverages"}, {"id": 96, "parent": 92, "name": "Apricot", "nature": "Items", "level": 5, "code": "A.01.01.06.03.04", "leaf": "Y", "indent": 24, "weight": 0.00111, "division": "Food and beverages"}, {"id": 97, "parent": 79, "name": "Berries, fresh", "nature": "Sub-classes", "level": 4, "code": "A.01.01.06.04", "leaf": "N", "indent": 20, "weight": 0.00249, "division": "Food and beverages"}, {"id": 98, "parent": 97, "name": "Berries", "nature": "Items", "level": 5, "code": "A.01.01.06.04.01", "leaf": "Y", "indent": 24, "weight": 0.00249, "division": "Food and beverages"}, {"id": 99, "parent": 79, "name": "Other fruits, fresh", "nature": "Sub-classes", "level": 4, "code": "A.01.01.06.05", "leaf": "N", "indent": 20, "weight": 0.38874, "division": "Food and beverages"}, {"id": 100, "parent": 99, "name": "Grapes", "nature": "Items", "level": 5, "code": "A.01.01.06.05.01", "leaf": "Y", "indent": 24, "weight": 0.15741, "division": "Food and beverages"}, {"id": 101, "parent": 99, "name": "Watermelon", "nature": "Items", "level": 5, "code": "A.01.01.06.05.02", "leaf": "Y", "indent": 24, "weight": 0.12954, "division": "Food and beverages"}, {"id": 102, "parent": 99, "name": "Kharbooza", "nature": "Items", "level": 5, "code": "A.01.01.06.05.03", "leaf": "Y", "indent": 24, "weight": 0.03258, "division": "Food and beverages"}, {"id": 103, "parent": 99, "name": "Singara", "nature": "Items", "level": 5, "code": "A.01.01.06.05.04", "leaf": "Y", "indent": 24, "weight": 0.0091, "division": "Food and beverages"}, {"id": 104, "parent": 99, "name": "Other fresh fruits", "nature": "Items", "level": 5, "code": "A.01.01.06.05.05", "leaf": "Y", "indent": 24, "weight": 0.06011, "division": "Food and beverages"}, {"id": 105, "parent": 79, "name": "Fruits, dried and dehydrated", "nature": "Sub-classes", "level": 4, "code": "A.01.01.06.06", "leaf": "N", "indent": 20, "weight": 0.40162, "division": "Food and beverages"}, {"id": 106, "parent": 105, "name": "Dates", "nature": "Items", "level": 5, "code": "A.01.01.06.06.01", "leaf": "Y", "indent": 24, "weight": 0.13954, "division": "Food and beverages"}, {"id": 107, "parent": 105, "name": "Raisin (kishmish) and monacca", "nature": "Items", "level": 5, "code": "A.01.01.06.06.02", "leaf": "Y", "indent": 24, "weight": 0.16392, "division": "Food and beverages"}, {"id": 108, "parent": 105, "name": "Coconut: copra", "nature": "Items", "level": 5, "code": "A.01.01.06.06.03", "leaf": "Y", "indent": 24, "weight": 0.08539, "division": "Food and beverages"}, {"id": 109, "parent": 105, "name": "Other dry fruits", "nature": "Items", "level": 5, "code": "A.01.01.06.06.04", "leaf": "Y", "indent": 24, "weight": 0.01277, "division": "Food and beverages"}, {"id": 110, "parent": 79, "name": "Nuts, in shell or shelled", "nature": "Sub-classes", "level": 4, "code": "A.01.01.06.07", "leaf": "N", "indent": 20, "weight": 0.71784, "division": "Food and beverages"}, {"id": 111, "parent": 110, "name": "Groundnut", "nature": "Items", "level": 5, "code": "A.01.01.06.07.01", "leaf": "Y", "indent": 24, "weight": 0.31725, "division": "Food and beverages"}, {"id": 112, "parent": 110, "name": "Cashew nut", "nature": "Items", "level": 5, "code": "A.01.01.06.07.02", "leaf": "Y", "indent": 24, "weight": 0.17677, "division": "Food and beverages"}, {"id": 113, "parent": 110, "name": "Other nuts", "nature": "Items", "level": 5, "code": "A.01.01.06.07.03", "leaf": "Y", "indent": 24, "weight": 0.22382, "division": "Food and beverages"}, {"id": 114, "parent": 2, "name": "Vegetables, tubers, plantains, cooking bananas and pulses", "nature": "Classes", "level": 3, "code": "A.01.01.07", "leaf": "N", "indent": 16, "weight": 6.81838, "division": "Food and beverages"}, {"id": 115, "parent": 114, "name": "Leafy or stem vegetables, fresh or chilled", "nature": "Sub-classes", "level": 4, "code": "A.01.01.07.01", "leaf": "N", "indent": 20, "weight": 0.69306, "division": "Food and beverages"}, {"id": 116, "parent": 115, "name": "Cauliflower", "nature": "Items", "level": 5, "code": "A.01.01.07.01.01", "leaf": "Y", "indent": 24, "weight": 0.233, "division": "Food and beverages"}, {"id": 117, "parent": 115, "name": "Cabbage", "nature": "Items", "level": 5, "code": "A.01.01.07.01.02", "leaf": "Y", "indent": 24, "weight": 0.15184, "division": "Food and beverages"}, {"id": 118, "parent": 115, "name": "Palak and other leafy vegetables", "nature": "Items", "level": 5, "code": "A.01.01.07.01.03", "leaf": "Y", "indent": 24, "weight": 0.30822, "division": "Food and beverages"}, {"id": 119, "parent": 114, "name": "Fruit-bearing vegetables, fresh or chilled", "nature": "Sub-classes", "level": 4, "code": "A.01.01.07.02", "leaf": "N", "indent": 20, "weight": 1.60082, "division": "Food and beverages"}, {"id": 120, "parent": 119, "name": "Tomato", "nature": "Items", "level": 5, "code": "A.01.01.07.02.01", "leaf": "Y", "indent": 24, "weight": 0.49606, "division": "Food and beverages"}, {"id": 121, "parent": 119, "name": "Lady's finger", "nature": "Items", "level": 5, "code": "A.01.01.07.02.02", "leaf": "Y", "indent": 24, "weight": 0.24878, "division": "Food and beverages"}, {"id": 122, "parent": 119, "name": "Brinjal", "nature": "Items", "level": 5, "code": "A.01.01.07.02.03", "leaf": "Y", "indent": 24, "weight": 0.2912, "division": "Food and beverages"}, {"id": 123, "parent": 119, "name": "Green chillies", "nature": "Items", "level": 5, "code": "A.01.01.07.02.04", "leaf": "Y", "indent": 24, "weight": 0.23789, "division": "Food and beverages"}, {"id": 124, "parent": 119, "name": "Gourd, pumpkin", "nature": "Items", "level": 5, "code": "A.01.01.07.02.05", "leaf": "Y", "indent": 24, "weight": 0.20344, "division": "Food and beverages"}, {"id": 125, "parent": 119, "name": "Parwal/patal and Kundru", "nature": "Items", "level": 5, "code": "A.01.01.07.02.06", "leaf": "Y", "indent": 24, "weight": 0.12345, "division": "Food and beverages"}, {"id": 126, "parent": 114, "name": "Green leguminous vegetables, fresh or chilled", "nature": "Sub-classes", "level": 4, "code": "A.01.01.07.03", "leaf": "N", "indent": 20, "weight": 0.28882, "division": "Food and beverages"}, {"id": 127, "parent": 126, "name": "Beans and Barbati", "nature": "Items", "level": 5, "code": "A.01.01.07.03.01", "leaf": "Y", "indent": 24, "weight": 0.16339, "division": "Food and beverages"}, {"id": 128, "parent": 126, "name": "Peas", "nature": "Items", "level": 5, "code": "A.01.01.07.03.02", "leaf": "Y", "indent": 24, "weight": 0.12543, "division": "Food and beverages"}, {"id": 129, "parent": 114, "name": "Other vegetables, fresh or chilled", "nature": "Sub-classes", "level": 4, "code": "A.01.01.07.04", "leaf": "N", "indent": 20, "weight": 1.75046, "division": "Food and beverages"}, {"id": 130, "parent": 129, "name": "Onion", "nature": "Items", "level": 5, "code": "A.01.01.07.04.01", "leaf": "Y", "indent": 24, "weight": 0.70056, "division": "Food and beverages"}, {"id": 131, "parent": 129, "name": "Garlic", "nature": "Items", "level": 5, "code": "A.01.01.07.04.02", "leaf": "Y", "indent": 24, "weight": 0.37381, "division": "Food and beverages"}, {"id": 132, "parent": 129, "name": "Carrot", "nature": "Items", "level": 5, "code": "A.01.01.07.04.03", "leaf": "Y", "indent": 24, "weight": 0.12177, "division": "Food and beverages"}, {"id": 133, "parent": 129, "name": "Radish", "nature": "Items", "level": 5, "code": "A.01.01.07.04.04", "leaf": "Y", "indent": 24, "weight": 0.06564, "division": "Food and beverages"}, {"id": 134, "parent": 129, "name": "Jackfruit", "nature": "Items", "level": 5, "code": "A.01.01.07.04.05", "leaf": "Y", "indent": 24, "weight": 0.00927, "division": "Food and beverages"}, {"id": 135, "parent": 129, "name": "Other vegetables", "nature": "Items", "level": 5, "code": "A.01.01.07.04.06", "leaf": "Y", "indent": 24, "weight": 0.47941, "division": "Food and beverages"}, {"id": 136, "parent": 114, "name": "Tubers, plantains and cooking bananas, fresh or chilled", "nature": "Sub-classes", "level": 4, "code": "A.01.01.07.05", "leaf": "N", "indent": 20, "weight": 0.75494, "division": "Food and beverages"}, {"id": 137, "parent": 136, "name": "Potato", "nature": "Items", "level": 5, "code": "A.01.01.07.05.01", "leaf": "Y", "indent": 24, "weight": 0.75494, "division": "Food and beverages"}, {"id": 138, "parent": 114, "name": "Pulses", "nature": "Sub-classes", "level": 4, "code": "A.01.01.07.06", "leaf": "N", "indent": 20, "weight": 1.47468, "division": "Food and beverages"}, {"id": 139, "parent": 138, "name": "Arhar, tur", "nature": "Items", "level": 5, "code": "A.01.01.07.06.01", "leaf": "Y", "indent": 24, "weight": 0.53334, "division": "Food and beverages"}, {"id": 140, "parent": 138, "name": "Moong", "nature": "Items", "level": 5, "code": "A.01.01.07.06.02", "leaf": "Y", "indent": 24, "weight": 0.23884, "division": "Food and beverages"}, {"id": 141, "parent": 138, "name": "Urd", "nature": "Items", "level": 5, "code": "A.01.01.07.06.03", "leaf": "Y", "indent": 24, "weight": 0.18431, "division": "Food and beverages"}, {"id": 142, "parent": 138, "name": "Masur", "nature": "Items", "level": 5, "code": "A.01.01.07.06.04", "leaf": "Y", "indent": 24, "weight": 0.20307, "division": "Food and beverages"}, {"id": 143, "parent": 138, "name": "Gram: split", "nature": "Items", "level": 5, "code": "A.01.01.07.06.05", "leaf": "Y", "indent": 24, "weight": 0.11506, "division": "Food and beverages"}, {"id": 144, "parent": 138, "name": "Gram: whole", "nature": "Items", "level": 5, "code": "A.01.01.07.06.06", "leaf": "Y", "indent": 24, "weight": 0.08854, "division": "Food and beverages"}, {"id": 145, "parent": 138, "name": "Peas, chickpeas", "nature": "Items", "level": 5, "code": "A.01.01.07.06.07", "leaf": "Y", "indent": 24, "weight": 0.05161, "division": "Food and beverages"}, {"id": 146, "parent": 138, "name": "Other pulses", "nature": "Items", "level": 5, "code": "A.01.01.07.06.08", "leaf": "Y", "indent": 24, "weight": 0.04733, "division": "Food and beverages"}, {"id": 147, "parent": 138, "name": "Pulses PDS", "nature": "Items", "level": 5, "code": "A.01.01.07.06.09", "leaf": "Y", "indent": 24, "weight": 0.01258, "division": "Food and beverages"}, {"id": 148, "parent": 114, "name": "Vegetables, tubers, plantains, cooking bananas and pulses ground, and in other  preparations", "nature": "Sub-classes", "level": 4, "code": "A.01.01.07.07", "leaf": "N", "indent": 20, "weight": 0.2556, "division": "Food and beverages"}, {"id": 149, "parent": 148, "name": "Besan and Gram products", "nature": "Items", "level": 5, "code": "A.01.01.07.07.01", "leaf": "Y", "indent": 24, "weight": 0.12386, "division": "Food and beverages"}, {"id": 150, "parent": 148, "name": "Pickles", "nature": "Items", "level": 5, "code": "A.01.01.07.07.02", "leaf": "Y", "indent": 24, "weight": 0.08583, "division": "Food and beverages"}, {"id": 151, "parent": 148, "name": "Other pulse products", "nature": "Items", "level": 5, "code": "A.01.01.07.07.03", "leaf": "Y", "indent": 24, "weight": 0.04591, "division": "Food and beverages"}, {"id": 152, "parent": 2, "name": "Sugar, confectionery and desserts", "nature": "Classes", "level": 3, "code": "A.01.01.08", "leaf": "N", "indent": 16, "weight": 1.41964, "division": "Food and beverages"}, {"id": 153, "parent": 152, "name": "Cane sugar and beet sugar", "nature": "Sub-classes", "level": 4, "code": "A.01.01.08.01", "leaf": "N", "indent": 20, "weight": 0.59502, "division": "Food and beverages"}, {"id": 154, "parent": 153, "name": "Sugar", "nature": "Items", "level": 5, "code": "A.01.01.08.01.01", "leaf": "Y", "indent": 24, "weight": 0.49661, "division": "Food and beverages"}, {"id": 155, "parent": 153, "name": "Jaggery (gur)", "nature": "Items", "level": 5, "code": "A.01.01.08.01.02", "leaf": "Y", "indent": 24, "weight": 0.08096, "division": "Food and beverages"}, {"id": 156, "parent": 153, "name": "Sugar PDS", "nature": "Items", "level": 5, "code": "A.01.01.08.01.03", "leaf": "Y", "indent": 24, "weight": 0.01745, "division": "Food and beverages"}, {"id": 157, "parent": 152, "name": "Jams, marmalades, fruit jellies, purees and pastes, and honey", "nature": "Sub-classes", "level": 4, "code": "A.01.01.08.02", "leaf": "N", "indent": 20, "weight": 0.02429, "division": "Food and beverages"}, {"id": 158, "parent": 157, "name": "Jam/ jelly", "nature": "Items", "level": 5, "code": "A.01.01.08.02.01", "leaf": "Y", "indent": 24, "weight": 0.01188, "division": "Food and beverages"}, {"id": 159, "parent": 157, "name": "Honey", "nature": "Items", "level": 5, "code": "A.01.01.08.02.02", "leaf": "Y", "indent": 24, "weight": 0.01241, "division": "Food and beverages"}, {"id": 160, "parent": 152, "name": "Chocolate, cocoa and cocoa-based food products", "nature": "Sub-classes", "level": 4, "code": "A.01.01.08.03", "leaf": "N", "indent": 20, "weight": 0.21143, "division": "Food and beverages"}, {"id": 161, "parent": 160, "name": "Chocolates, etc.", "nature": "Items", "level": 5, "code": "A.01.01.08.03.01", "leaf": "Y", "indent": 24, "weight": 0.21143, "division": "Food and beverages"}, {"id": 162, "parent": 152, "name": "Ice, ice cream and sorbets", "nature": "Sub-classes", "level": 4, "code": "A.01.01.08.04", "leaf": "N", "indent": 20, "weight": 0.29621, "division": "Food and beverages"}, {"id": 163, "parent": 162, "name": "Ice-cream", "nature": "Items", "level": 5, "code": "A.01.01.08.04.01", "leaf": "Y", "indent": 24, "weight": 0.29621, "division": "Food and beverages"}, {"id": 164, "parent": 152, "name": "Other sugar confectionery and desserts", "nature": "Sub-classes", "level": 4, "code": "A.01.01.08.05", "leaf": "N", "indent": 20, "weight": 0.29269, "division": "Food and beverages"}, {"id": 165, "parent": 164, "name": "Prepared sweets -non milk based", "nature": "Items", "level": 5, "code": "A.01.01.08.05.01", "leaf": "Y", "indent": 24, "weight": 0.28571, "division": "Food and beverages"}, {"id": 166, "parent": 164, "name": "Candy, misri", "nature": "Items", "level": 5, "code": "A.01.01.08.05.02", "leaf": "Y", "indent": 24, "weight": 0.00698, "division": "Food and beverages"}, {"id": 167, "parent": 2, "name": "Ready-made food and other food products", "nature": "Classes", "level": 3, "code": "A.01.01.09", "leaf": "N", "indent": 16, "weight": 3.32966, "division": "Food and beverages"}, {"id": 168, "parent": 167, "name": "Ready-made food", "nature": "Sub-classes", "level": 4, "code": "A.01.01.09.01", "leaf": "N", "indent": 20, "weight": 0.32239, "division": "Food and beverages"}, {"id": 169, "parent": 168, "name": "Other served processed food", "nature": "Items", "level": 5, "code": "A.01.01.09.01.01", "leaf": "Y", "indent": 24, "weight": 0.20136, "division": "Food and beverages"}, {"id": 170, "parent": 168, "name": "Other packaged processed food", "nature": "Items", "level": 5, "code": "A.01.01.09.01.02", "leaf": "Y", "indent": 24, "weight": 0.12103, "division": "Food and beverages"}, {"id": 171, "parent": 167, "name": "Baby food", "nature": "Sub-classes", "level": 4, "code": "A.01.01.09.02", "leaf": "N", "indent": 20, "weight": 0.12483, "division": "Food and beverages"}, {"id": 172, "parent": 171, "name": "Baby food", "nature": "Items", "level": 5, "code": "A.01.01.09.02.01", "leaf": "Y", "indent": 24, "weight": 0.12483, "division": "Food and beverages"}, {"id": 173, "parent": 167, "name": "Salt, condiments and sauces", "nature": "Sub-classes", "level": 4, "code": "A.01.01.09.03", "leaf": "N", "indent": 20, "weight": 0.09455, "division": "Food and beverages"}, {"id": 174, "parent": 173, "name": "Salt", "nature": "Items", "level": 5, "code": "A.01.01.09.03.01", "leaf": "Y", "indent": 24, "weight": 0.0823, "division": "Food and beverages"}, {"id": 175, "parent": 173, "name": "Sauce and Mayonnaise", "nature": "Items", "level": 5, "code": "A.01.01.09.03.02", "leaf": "Y", "indent": 24, "weight": 0.01189, "division": "Food and beverages"}, {"id": 176, "parent": 173, "name": "Salt PDS", "nature": "Items", "level": 5, "code": "A.01.01.09.03.03", "leaf": "Y", "indent": 24, "weight": 0.00036, "division": "Food and beverages"}, {"id": 177, "parent": 167, "name": "Spices, culinary herbs and seeds", "nature": "Sub-classes", "level": 4, "code": "A.01.01.09.04", "leaf": "N", "indent": 20, "weight": 2.27432, "division": "Food and beverages"}, {"id": 178, "parent": 177, "name": "Dry chillies", "nature": "Items", "level": 5, "code": "A.01.01.09.04.01", "leaf": "Y", "indent": 24, "weight": 0.40498, "division": "Food and beverages"}, {"id": 179, "parent": 177, "name": "Cumin (jeera)", "nature": "Items", "level": 5, "code": "A.01.01.09.04.02", "leaf": "Y", "indent": 24, "weight": 0.36551, "division": "Food and beverages"}, {"id": 180, "parent": 177, "name": "Coriander (dhania)", "nature": "Items", "level": 5, "code": "A.01.01.09.04.03", "leaf": "Y", "indent": 24, "weight": 0.29851, "division": "Food and beverages"}, {"id": 181, "parent": 177, "name": "Ginger", "nature": "Items", "level": 5, "code": "A.01.01.09.04.04", "leaf": "Y", "indent": 24, "weight": 0.2556, "division": "Food and beverages"}, {"id": 182, "parent": 177, "name": "Turmeric", "nature": "Items", "level": 5, "code": "A.01.01.09.04.05", "leaf": "Y", "indent": 24, "weight": 0.26151, "division": "Food and beverages"}, {"id": 183, "parent": 177, "name": "Curry powder", "nature": "Items", "level": 5, "code": "A.01.01.09.04.06", "leaf": "Y", "indent": 24, "weight": 0.17078, "division": "Food and beverages"}, {"id": 184, "parent": 177, "name": "Black pepper", "nature": "Items", "level": 5, "code": "A.01.01.09.04.07", "leaf": "Y", "indent": 24, "weight": 0.11503, "division": "Food and beverages"}, {"id": 185, "parent": 177, "name": "Tamarind", "nature": "Items", "level": 5, "code": "A.01.01.09.04.08", "leaf": "Y", "indent": 24, "weight": 0.06129, "division": "Food and beverages"}, {"id": 186, "parent": 177, "name": "Oilseeds", "nature": "Items", "level": 5, "code": "A.01.01.09.04.09", "leaf": "Y", "indent": 24, "weight": 0.0644, "division": "Food and beverages"}, {"id": 187, "parent": 177, "name": "Poppy seeds", "nature": "Items", "level": 5, "code": "A.01.01.09.04.10", "leaf": "Y", "indent": 24, "weight": 0.02725, "division": "Food and beverages"}, {"id": 188, "parent": 177, "name": "Other spices", "nature": "Items", "level": 5, "code": "A.01.01.09.04.11", "leaf": "Y", "indent": 24, "weight": 0.24946, "division": "Food and beverages"}, {"id": 189, "parent": 167, "name": "Other food products n.e.c.", "nature": "Sub-classes", "level": 4, "code": "A.01.01.09.05", "leaf": "N", "indent": 20, "weight": 0.51357, "division": "Food and beverages"}, {"id": 190, "parent": 189, "name": "Papad, bhujia, namkeen, mixture and chanachur", "nature": "Items", "level": 5, "code": "A.01.01.09.05.01", "leaf": "Y", "indent": 24, "weight": 0.47514, "division": "Food and beverages"}, {"id": 191, "parent": 189, "name": "Health supplements (probiotic tablet and drinks)", "nature": "Items", "level": 5, "code": "A.01.01.09.05.02", "leaf": "Y", "indent": 24, "weight": 0.03843, "division": "Food and beverages"}, {"id": 192, "parent": 1, "name": "Beverages", "nature": "Groups", "level": 2, "code": "A.01.02", "leaf": "N", "indent": 12, "weight": 1.77243, "division": "Food and beverages"}, {"id": 193, "parent": 192, "name": "Fruit and vegetable juices", "nature": "Classes", "level": 3, "code": "A.01.02.01", "leaf": "N", "indent": 16, "weight": 0.51906, "division": "Food and beverages"}, {"id": 194, "parent": 193, "name": "Fruit and vegetable juices", "nature": "Sub-classes", "level": 4, "code": "A.01.02.01.01", "leaf": "N", "indent": 20, "weight": 0.51906, "division": "Food and beverages"}, {"id": 195, "parent": 194, "name": "Fruit juice", "nature": "Items", "level": 5, "code": "A.01.02.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.51906, "division": "Food and beverages"}, {"id": 196, "parent": 192, "name": "Coffee and coffee substitutes", "nature": "Classes", "level": 3, "code": "A.01.02.02", "leaf": "N", "indent": 16, "weight": 0.04522, "division": "Food and beverages"}, {"id": 197, "parent": 196, "name": "Coffee: powder", "nature": "Sub-classes", "level": 4, "code": "A.01.02.02.01", "leaf": "N", "indent": 20, "weight": 0.04522, "division": "Food and beverages"}, {"id": 198, "parent": 197, "name": "Coffee: powder", "nature": "Items", "level": 5, "code": "A.01.02.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.04522, "division": "Food and beverages"}, {"id": 199, "parent": 192, "name": "Tea, mat and other plant-derived products for infusion", "nature": "Classes", "level": 3, "code": "A.01.02.03", "leaf": "N", "indent": 16, "weight": 0.67416, "division": "Food and beverages"}, {"id": 200, "parent": 199, "name": "Tea: leaf", "nature": "Sub-classes", "level": 4, "code": "A.01.02.03.01", "leaf": "N", "indent": 20, "weight": 0.67416, "division": "Food and beverages"}, {"id": 201, "parent": 200, "name": "Tea: leaf", "nature": "Items", "level": 5, "code": "A.01.02.03.01.01", "leaf": "Y", "indent": 24, "weight": 0.67416, "division": "Food and beverages"}, {"id": 202, "parent": 192, "name": "Cocoa drinks", "nature": "Classes", "level": 3, "code": "A.01.02.04", "leaf": "N", "indent": 16, "weight": 0.10157, "division": "Food and beverages"}, {"id": 203, "parent": 202, "name": "Cocoa drinks", "nature": "Sub-classes", "level": 4, "code": "A.01.02.04.01", "leaf": "N", "indent": 20, "weight": 0.10157, "division": "Food and beverages"}, {"id": 204, "parent": 203, "name": "Beverages: cocoa and chocolate drink", "nature": "Items", "level": 5, "code": "A.01.02.04.01.01", "leaf": "Y", "indent": 24, "weight": 0.10157, "division": "Food and beverages"}, {"id": 205, "parent": 192, "name": "Water", "nature": "Classes", "level": 3, "code": "A.01.02.05", "leaf": "N", "indent": 16, "weight": 0.07882, "division": "Food and beverages"}, {"id": 206, "parent": 205, "name": "Packaged water", "nature": "Sub-classes", "level": 4, "code": "A.01.02.05.01", "leaf": "N", "indent": 20, "weight": 0.07882, "division": "Food and beverages"}, {"id": 207, "parent": 206, "name": "Packaged water", "nature": "Items", "level": 5, "code": "A.01.02.05.01.01", "leaf": "Y", "indent": 24, "weight": 0.07882, "division": "Food and beverages"}, {"id": 208, "parent": 192, "name": "Soft drinks", "nature": "Classes", "level": 3, "code": "A.01.02.06", "leaf": "N", "indent": 16, "weight": 0.06631, "division": "Food and beverages"}, {"id": 209, "parent": 208, "name": "Soda drinks", "nature": "Sub-classes", "level": 4, "code": "A.01.02.06.01", "leaf": "N", "indent": 20, "weight": 0.06631, "division": "Food and beverages"}, {"id": 210, "parent": 209, "name": "Soda drinks", "nature": "Items", "level": 5, "code": "A.01.02.06.01.01", "leaf": "Y", "indent": 24, "weight": 0.06631, "division": "Food and beverages"}, {"id": 211, "parent": 192, "name": "Other beverages", "nature": "Classes", "level": 3, "code": "A.01.02.07", "leaf": "N", "indent": 16, "weight": 0.28728, "division": "Food and beverages"}, {"id": 212, "parent": 211, "name": "Other beverages", "nature": "Sub-classes", "level": 4, "code": "A.01.02.07.01", "leaf": "N", "indent": 20, "weight": 0.28728, "division": "Food and beverages"}, {"id": 213, "parent": 212, "name": "Health supplements (protein powder)", "nature": "Items", "level": 5, "code": "A.01.02.07.01.01", "leaf": "Y", "indent": 24, "weight": 0.03862, "division": "Food and beverages"}, {"id": 214, "parent": 212, "name": "Health drinks", "nature": "Items", "level": 5, "code": "A.01.02.07.01.02", "leaf": "Y", "indent": 24, "weight": 0.10184, "division": "Food and beverages"}, {"id": 215, "parent": 212, "name": "Other cold beverages", "nature": "Items", "level": 5, "code": "A.01.02.07.01.03", "leaf": "Y", "indent": 24, "weight": 0.14682, "division": "Food and beverages"}, {"id": 216, "parent": 1, "name": "Services for processing primary goods for food", "nature": "Groups", "level": 2, "code": "A.01.03", "leaf": "N", "indent": 12, "weight": 0.20297, "division": "Food and beverages"}, {"id": 217, "parent": 216, "name": "Services for processing primary goods for food", "nature": "Classes", "level": 3, "code": "A.01.03.01", "leaf": "N", "indent": 16, "weight": 0.20297, "division": "Food and beverages"}, {"id": 218, "parent": 217, "name": "Services for processing primary goods for food", "nature": "Sub-classes", "level": 4, "code": "A.01.03.01.01", "leaf": "N", "indent": 20, "weight": 0.20297, "division": "Food and beverages"}, {"id": 219, "parent": 218, "name": "Grinding/ husking charges", "nature": "Items", "level": 5, "code": "A.01.03.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.20297, "division": "Food and beverages"}, {"id": 220, "parent": 0, "name": "Paan, tobacco and intoxicants", "nature": "Divisions", "level": 1, "code": "A.02", "leaf": "N", "indent": 8, "weight": 2.98945, "division": "Paan, tobacco and intoxicants"}, {"id": 221, "parent": 220, "name": "Alcoholic beverages", "nature": "Groups", "level": 2, "code": "A.02.01", "leaf": "N", "indent": 12, "weight": 1.44584, "division": "Paan, tobacco and intoxicants"}, {"id": 222, "parent": 221, "name": "Spirits and liquors", "nature": "Classes", "level": 3, "code": "A.02.01.01", "leaf": "N", "indent": 16, "weight": 1.03366, "division": "Paan, tobacco and intoxicants"}, {"id": 223, "parent": 222, "name": "Spirits and liquors", "nature": "Sub-classes", "level": 4, "code": "A.02.01.01.01", "leaf": "N", "indent": 20, "weight": 1.03366, "division": "Paan, tobacco and intoxicants"}, {"id": 224, "parent": 223, "name": "Foreign/refined liquor or wine", "nature": "Items", "level": 5, "code": "A.02.01.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.63781, "division": "Paan, tobacco and intoxicants"}, {"id": 225, "parent": 223, "name": "Country liquor", "nature": "Items", "level": 5, "code": "A.02.01.01.01.02", "leaf": "Y", "indent": 24, "weight": 0.39585, "division": "Paan, tobacco and intoxicants"}, {"id": 226, "parent": 221, "name": "Wine", "nature": "Classes", "level": 3, "code": "A.02.01.02", "leaf": "N", "indent": 16, "weight": 0.06301, "division": "Paan, tobacco and intoxicants"}, {"id": 227, "parent": 226, "name": "Wine from other sources", "nature": "Sub-classes", "level": 4, "code": "A.02.01.02.01", "leaf": "N", "indent": 20, "weight": 0.06301, "division": "Paan, tobacco and intoxicants"}, {"id": 228, "parent": 227, "name": "Toddy", "nature": "Items", "level": 5, "code": "A.02.01.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.06301, "division": "Paan, tobacco and intoxicants"}, {"id": 229, "parent": 221, "name": "Beer", "nature": "Classes", "level": 3, "code": "A.02.01.03", "leaf": "N", "indent": 16, "weight": 0.31059, "division": "Paan, tobacco and intoxicants"}, {"id": 230, "parent": 229, "name": "Beer", "nature": "Sub-classes", "level": 4, "code": "A.02.01.03.01", "leaf": "N", "indent": 20, "weight": 0.31059, "division": "Paan, tobacco and intoxicants"}, {"id": 231, "parent": 230, "name": "Beer", "nature": "Items", "level": 5, "code": "A.02.01.03.01.01", "leaf": "Y", "indent": 24, "weight": 0.31059, "division": "Paan, tobacco and intoxicants"}, {"id": 232, "parent": 221, "name": "Other alcoholic beverages", "nature": "Classes", "level": 3, "code": "A.02.01.04", "leaf": "N", "indent": 16, "weight": 0.03858, "division": "Paan, tobacco and intoxicants"}, {"id": 233, "parent": 232, "name": "Other alcoholic beverages", "nature": "Sub-classes", "level": 4, "code": "A.02.01.04.01", "leaf": "N", "indent": 20, "weight": 0.03858, "division": "Paan, tobacco and intoxicants"}, {"id": 234, "parent": 233, "name": "Other intoxicants", "nature": "Items", "level": 5, "code": "A.02.01.04.01.01", "leaf": "Y", "indent": 24, "weight": 0.03858, "division": "Paan, tobacco and intoxicants"}, {"id": 235, "parent": 220, "name": "Paan and tobacco", "nature": "Groups", "level": 2, "code": "A.02.02", "leaf": "N", "indent": 12, "weight": 1.54361, "division": "Paan, tobacco and intoxicants"}, {"id": 236, "parent": 235, "name": "Paan and other tobacco products", "nature": "Classes", "level": 3, "code": "A.02.02.01", "leaf": "N", "indent": 16, "weight": 1.54361, "division": "Paan, tobacco and intoxicants"}, {"id": 237, "parent": 236, "name": "Cigarettes", "nature": "Sub-classes", "level": 4, "code": "A.02.02.01.01", "leaf": "N", "indent": 20, "weight": 0.3105, "division": "Paan, tobacco and intoxicants"}, {"id": 238, "parent": 237, "name": "Cigarettes", "nature": "Items", "level": 5, "code": "A.02.02.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.3105, "division": "Paan, tobacco and intoxicants"}, {"id": 239, "parent": 236, "name": "Cigars", "nature": "Sub-classes", "level": 4, "code": "A.02.02.01.02", "leaf": "N", "indent": 20, "weight": 0.00122, "division": "Paan, tobacco and intoxicants"}, {"id": 240, "parent": 239, "name": "Cheroot", "nature": "Items", "level": 5, "code": "A.02.02.01.02.01", "leaf": "Y", "indent": 24, "weight": 0.00122, "division": "Paan, tobacco and intoxicants"}, {"id": 241, "parent": 236, "name": "Paan and other tobacco products", "nature": "Sub-classes", "level": 4, "code": "A.02.02.01.03", "leaf": "N", "indent": 20, "weight": 1.23189, "division": "Paan, tobacco and intoxicants"}, {"id": 242, "parent": 241, "name": "Gutka, zarda, kimam, surti", "nature": "Items", "level": 5, "code": "A.02.02.01.03.01", "leaf": "Y", "indent": 24, "weight": 0.43371, "division": "Paan, tobacco and intoxicants"}, {"id": 243, "parent": 241, "name": "Paan: finished", "nature": "Items", "level": 5, "code": "A.02.02.01.03.02", "leaf": "Y", "indent": 24, "weight": 0.21839, "division": "Paan, tobacco and intoxicants"}, {"id": 244, "parent": 241, "name": "Bidi", "nature": "Items", "level": 5, "code": "A.02.02.01.03.03", "leaf": "Y", "indent": 24, "weight": 0.20205, "division": "Paan, tobacco and intoxicants"}, {"id": 245, "parent": 241, "name": "Ingredients for paan", "nature": "Items", "level": 5, "code": "A.02.02.01.03.04", "leaf": "Y", "indent": 24, "weight": 0.11094, "division": "Paan, tobacco and intoxicants"}, {"id": 246, "parent": 241, "name": "Leaf tobacco", "nature": "Items", "level": 5, "code": "A.02.02.01.03.05", "leaf": "Y", "indent": 24, "weight": 0.10191, "division": "Paan, tobacco and intoxicants"}, {"id": 247, "parent": 241, "name": "Paan: leaf", "nature": "Items", "level": 5, "code": "A.02.02.01.03.06", "leaf": "Y", "indent": 24, "weight": 0.05468, "division": "Paan, tobacco and intoxicants"}, {"id": 248, "parent": 241, "name": "Hookah tobacco", "nature": "Items", "level": 5, "code": "A.02.02.01.03.07", "leaf": "Y", "indent": 24, "weight": 0.00832, "division": "Paan, tobacco and intoxicants"}, {"id": 249, "parent": 241, "name": "Snuff", "nature": "Items", "level": 5, "code": "A.02.02.01.03.08", "leaf": "Y", "indent": 24, "weight": 0.00166, "division": "Paan, tobacco and intoxicants"}, {"id": 250, "parent": 241, "name": "Other tobacco products", "nature": "Items", "level": 5, "code": "A.02.02.01.03.09", "leaf": "Y", "indent": 24, "weight": 0.10023, "division": "Paan, tobacco and intoxicants"}, {"id": 251, "parent": 0, "name": "Clothing and footwear", "nature": "Divisions", "level": 1, "code": "A.03", "leaf": "N", "indent": 8, "weight": 6.38326, "division": "Clothing and footwear"}, {"id": 252, "parent": 251, "name": "Clothing", "nature": "Groups", "level": 2, "code": "A.03.01", "leaf": "N", "indent": 12, "weight": 5.5316, "division": "Clothing and footwear"}, {"id": 253, "parent": 252, "name": "Clothing materials", "nature": "Classes", "level": 3, "code": "A.03.01.01", "leaf": "N", "indent": 16, "weight": 0.29872, "division": "Clothing and footwear"}, {"id": 254, "parent": 253, "name": "Clothing materials", "nature": "Sub-classes", "level": 4, "code": "A.03.01.01.01", "leaf": "N", "indent": 20, "weight": 0.29872, "division": "Clothing and footwear"}, {"id": 255, "parent": 254, "name": "Clothing materials", "nature": "Items", "level": 5, "code": "A.03.01.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.29872, "division": "Clothing and footwear"}, {"id": 256, "parent": 252, "name": "Garments", "nature": "Classes", "level": 3, "code": "A.03.01.02", "leaf": "N", "indent": 16, "weight": 3.98233, "division": "Clothing and footwear"}, {"id": 257, "parent": 256, "name": "Garments for men or boys", "nature": "Sub-classes", "level": 4, "code": "A.03.01.02.01", "leaf": "N", "indent": 20, "weight": 1.67062, "division": "Clothing and footwear"}, {"id": 258, "parent": 257, "name": "Shirts, T-shirts, Kurta (gents)", "nature": "Items", "level": 5, "code": "A.03.01.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.67663, "division": "Clothing and footwear"}, {"id": 259, "parent": 257, "name": "Trousers, jeans, track pants, shorts (gents)", "nature": "Items", "level": 5, "code": "A.03.01.02.01.02", "leaf": "Y", "indent": 24, "weight": 0.49594, "division": "Clothing and footwear"}, {"id": 260, "parent": 257, "name": "Coat, jacket, blazer, sweater, sweatshirts and windcheater (gents)", "nature": "Items", "level": 5, "code": "A.03.01.02.01.03", "leaf": "Y", "indent": 24, "weight": 0.12526, "division": "Clothing and footwear"}, {"id": 261, "parent": 257, "name": "Dhoti/ Lungi", "nature": "Items", "level": 5, "code": "A.03.01.02.01.04", "leaf": "Y", "indent": 24, "weight": 0.09736, "division": "Clothing and footwear"}, {"id": 262, "parent": 257, "name": "Other garments for men or boys", "nature": "Items", "level": 5, "code": "A.03.01.02.01.05", "leaf": "Y", "indent": 24, "weight": 0.27543, "division": "Clothing and footwear"}, {"id": 263, "parent": 256, "name": "Garments for women or girls", "nature": "Sub-classes", "level": 4, "code": "A.03.01.02.02", "leaf": "N", "indent": 20, "weight": 2.07376, "division": "Clothing and footwear"}, {"id": 264, "parent": 263, "name": "Saree", "nature": "Items", "level": 5, "code": "A.03.01.02.02.01", "leaf": "Y", "indent": 24, "weight": 0.52813, "division": "Clothing and footwear"}, {"id": 265, "parent": 263, "name": "Tops, shrugs, kurti (ladies)", "nature": "Items", "level": 5, "code": "A.03.01.02.02.02", "leaf": "Y", "indent": 24, "weight": 0.30634, "division": "Clothing and footwear"}, {"id": 266, "parent": 263, "name": "Trousers, jeans, slawars, Skirts (ladies)", "nature": "Items", "level": 5, "code": "A.03.01.02.02.03", "leaf": "Y", "indent": 24, "weight": 0.51563, "division": "Clothing and footwear"}, {"id": 267, "parent": 263, "name": "Coat, jacket, blazer, sweater, sweatshirts and windcheater  (ladies)", "nature": "Items", "level": 5, "code": "A.03.01.02.02.04", "leaf": "Y", "indent": 24, "weight": 0.10501, "division": "Clothing and footwear"}, {"id": 268, "parent": 263, "name": "Other garments for women or girls", "nature": "Items", "level": 5, "code": "A.03.01.02.02.05", "leaf": "Y", "indent": 24, "weight": 0.61865, "division": "Clothing and footwear"}, {"id": 269, "parent": 256, "name": "Garments for infants (under 2 years of age)", "nature": "Sub-classes", "level": 4, "code": "A.03.01.02.03", "leaf": "N", "indent": 20, "weight": 0.04374, "division": "Clothing and footwear"}, {"id": 270, "parent": 269, "name": "Garments for infants", "nature": "Items", "level": 5, "code": "A.03.01.02.03.01", "leaf": "Y", "indent": 24, "weight": 0.04374, "division": "Clothing and footwear"}, {"id": 271, "parent": 256, "name": "School uniforms", "nature": "Sub-classes", "level": 4, "code": "A.03.01.02.04", "leaf": "N", "indent": 20, "weight": 0.19421, "division": "Clothing and footwear"}, {"id": 272, "parent": 271, "name": "School uniforms", "nature": "Items", "level": 5, "code": "A.03.01.02.04.01", "leaf": "Y", "indent": 24, "weight": 0.19421, "division": "Clothing and footwear"}, {"id": 273, "parent": 252, "name": "Other articles of clothing and clothing accessories", "nature": "Classes", "level": 3, "code": "A.03.01.03", "leaf": "N", "indent": 16, "weight": 0.27784, "division": "Clothing and footwear"}, {"id": 274, "parent": 273, "name": "Other articles of clothing", "nature": "Sub-classes", "level": 4, "code": "A.03.01.03.01", "leaf": "N", "indent": 20, "weight": 0.27784, "division": "Clothing and footwear"}, {"id": 275, "parent": 274, "name": "Gamchha, towel and handkerchief", "nature": "Items", "level": 5, "code": "A.03.01.03.01.01", "leaf": "Y", "indent": 24, "weight": 0.11738, "division": "Clothing and footwear"}, {"id": 276, "parent": 274, "name": "Shawl and chaddar", "nature": "Items", "level": 5, "code": "A.03.01.03.01.02", "leaf": "Y", "indent": 24, "weight": 0.06426, "division": "Clothing and footwear"}, {"id": 277, "parent": 274, "name": "Other articles of clothing (including knitting wool)", "nature": "Items", "level": 5, "code": "A.03.01.03.01.03", "leaf": "Y", "indent": 24, "weight": 0.0962, "division": "Clothing and footwear"}, {"id": 278, "parent": 252, "name": "Cleaning, ironing, dry cleaning, dyeing, repair, tailoring and hire of clothing", "nature": "Classes", "level": 3, "code": "A.03.01.04", "leaf": "N", "indent": 16, "weight": 0.97272, "division": "Clothing and footwear"}, {"id": 279, "parent": 278, "name": "Cleaning, ironing, dry cleaning and dyeing of clothing", "nature": "Sub-classes", "level": 4, "code": "A.03.01.04.01", "leaf": "N", "indent": 20, "weight": 0.10529, "division": "Clothing and footwear"}, {"id": 280, "parent": 279, "name": "Washerman, laundry, ironing, dry cleaning and dyeing", "nature": "Items", "level": 5, "code": "A.03.01.04.01.01", "leaf": "Y", "indent": 24, "weight": 0.10529, "division": "Clothing and footwear"}, {"id": 281, "parent": 278, "name": "Repair, tailoring and hire of clothing", "nature": "Sub-classes", "level": 4, "code": "A.03.01.04.02", "leaf": "N", "indent": 20, "weight": 0.86743, "division": "Clothing and footwear"}, {"id": 282, "parent": 281, "name": "Tailor", "nature": "Items", "level": 5, "code": "A.03.01.04.02.01", "leaf": "Y", "indent": 24, "weight": 0.86743, "division": "Clothing and footwear"}, {"id": 283, "parent": 251, "name": "Footwear", "nature": "Groups", "level": 2, "code": "A.03.02", "leaf": "N", "indent": 12, "weight": 0.85166, "division": "Clothing and footwear"}, {"id": 284, "parent": 283, "name": "Shoes and other footwear", "nature": "Classes", "level": 3, "code": "A.03.02.01", "leaf": "N", "indent": 16, "weight": 0.85166, "division": "Clothing and footwear"}, {"id": 285, "parent": 284, "name": "Footwear for men", "nature": "Sub-classes", "level": 4, "code": "A.03.02.01.01", "leaf": "N", "indent": 20, "weight": 0.30555, "division": "Clothing and footwear"}, {"id": 286, "parent": 285, "name": "Footwear for men", "nature": "Items", "level": 5, "code": "A.03.02.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.30555, "division": "Clothing and footwear"}, {"id": 287, "parent": 284, "name": "Footwear for women", "nature": "Sub-classes", "level": 4, "code": "A.03.02.01.02", "leaf": "N", "indent": 20, "weight": 0.29102, "division": "Clothing and footwear"}, {"id": 288, "parent": 287, "name": "Footwear for women", "nature": "Items", "level": 5, "code": "A.03.02.01.02.01", "leaf": "Y", "indent": 24, "weight": 0.29102, "division": "Clothing and footwear"}, {"id": 289, "parent": 284, "name": "Footwear for infants and children", "nature": "Sub-classes", "level": 4, "code": "A.03.02.01.03", "leaf": "N", "indent": 20, "weight": 0.25509, "division": "Clothing and footwear"}, {"id": 290, "parent": 289, "name": "Footwear for infants and children", "nature": "Items", "level": 5, "code": "A.03.02.01.03.01", "leaf": "Y", "indent": 24, "weight": 0.25509, "division": "Clothing and footwear"}, {"id": 291, "parent": 0, "name": "Housing, water, electricity, gas and other fuels", "nature": "Divisions", "level": 1, "code": "A.04", "leaf": "N", "indent": 8, "weight": 17.66457, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 292, "parent": 291, "name": "Actual rental payments made for housing", "nature": "Groups", "level": 2, "code": "A.04.01", "leaf": "N", "indent": 12, "weight": 10.88497, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 293, "parent": 292, "name": "Actual rental payments made by tenants for main residence", "nature": "Classes", "level": 3, "code": "A.04.01.01", "leaf": "N", "indent": 16, "weight": 10.88497, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 294, "parent": 293, "name": "Actual rental payments made by tenants for main residence", "nature": "Sub-classes", "level": 4, "code": "A.04.01.01.01", "leaf": "N", "indent": 20, "weight": 10.88497, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 295, "parent": 294, "name": "House Rent", "nature": "Items", "level": 5, "code": "A.04.01.01.01.01", "leaf": "Y", "indent": 24, "weight": 10.88497, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 296, "parent": 291, "name": "Maintenance, repair and security of the dwelling", "nature": "Groups", "level": 2, "code": "A.04.02", "leaf": "N", "indent": 12, "weight": 1.18872, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 297, "parent": 296, "name": "Security equipment and materials for dwelling maintenance and repair", "nature": "Classes", "level": 3, "code": "A.04.02.01", "leaf": "N", "indent": 16, "weight": 0.09477, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 298, "parent": 297, "name": "Materials for the maintenance and repair of the dwelling", "nature": "Sub-classes", "level": 4, "code": "A.04.02.01.01", "leaf": "N", "indent": 20, "weight": 0.09477, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 299, "parent": 298, "name": "Plugs, switches and other electrical fittings", "nature": "Items", "level": 5, "code": "A.04.02.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.09477, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 300, "parent": 296, "name": "Services for the maintenance, repair and security of the dwelling", "nature": "Classes", "level": 3, "code": "A.04.02.02", "leaf": "N", "indent": 16, "weight": 1.09395, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 301, "parent": 300, "name": "Services for the maintenance, repair and security of the dwelling", "nature": "Sub-classes", "level": 4, "code": "A.04.02.02.01", "leaf": "N", "indent": 20, "weight": 1.09395, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 302, "parent": 301, "name": "Residential building and land (minor repairs)", "nature": "Items", "level": 5, "code": "A.04.02.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.77964, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 303, "parent": 301, "name": "Repair charges for non-durables (electricity charges, plumbing charges etc.)", "nature": "Items", "level": 5, "code": "A.04.02.02.01.02", "leaf": "Y", "indent": 24, "weight": 0.19609, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 304, "parent": 301, "name": "Watchmen/security guard", "nature": "Items", "level": 5, "code": "A.04.02.02.01.03", "leaf": "Y", "indent": 24, "weight": 0.01434, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 305, "parent": 301, "name": "Other consumer rent", "nature": "Items", "level": 5, "code": "A.04.02.02.01.04", "leaf": "Y", "indent": 24, "weight": 0.10388, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 306, "parent": 291, "name": "Water supply and miscellaneous services relating to the dwelling", "nature": "Groups", "level": 2, "code": "A.04.03", "leaf": "N", "indent": 12, "weight": 0.22945, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 307, "parent": 306, "name": "Water supply", "nature": "Classes", "level": 3, "code": "A.04.03.01", "leaf": "N", "indent": 16, "weight": 0.17552, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 308, "parent": 307, "name": "Water charges", "nature": "Sub-classes", "level": 4, "code": "A.04.03.01.01", "leaf": "N", "indent": 20, "weight": 0.17552, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 309, "parent": 308, "name": "Water charges", "nature": "Items", "level": 5, "code": "A.04.03.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.17552, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 310, "parent": 306, "name": "Other services related to the dwelling", "nature": "Classes", "level": 3, "code": "A.04.03.02", "leaf": "N", "indent": 16, "weight": 0.05393, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 311, "parent": 310, "name": "Other services related to the dwelling n.e.c.", "nature": "Sub-classes", "level": 4, "code": "A.04.03.02.01", "leaf": "N", "indent": 20, "weight": 0.05393, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 312, "parent": 311, "name": "Sweeper", "nature": "Items", "level": 5, "code": "A.04.03.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.05393, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 313, "parent": 291, "name": "Electricity, gas and other fuels", "nature": "Groups", "level": 2, "code": "A.04.04", "leaf": "N", "indent": 12, "weight": 5.36143, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 314, "parent": 313, "name": "Electricity", "nature": "Classes", "level": 3, "code": "A.04.04.01", "leaf": "N", "indent": 16, "weight": 2.3277, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 315, "parent": 314, "name": "Electricity", "nature": "Sub-classes", "level": 4, "code": "A.04.04.01.01", "leaf": "N", "indent": 20, "weight": 2.3277, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 316, "parent": 315, "name": "Electricity charges", "nature": "Items", "level": 5, "code": "A.04.04.01.01.01", "leaf": "Y", "indent": 24, "weight": 2.3277, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 317, "parent": 313, "name": "Gas", "nature": "Classes", "level": 3, "code": "A.04.04.02", "leaf": "N", "indent": 16, "weight": 1.98137, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 318, "parent": 317, "name": "LPG Cylinders and Piped natural gas", "nature": "Sub-classes", "level": 4, "code": "A.04.04.02.01", "leaf": "N", "indent": 20, "weight": 1.98137, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 319, "parent": 318, "name": "LPG cylinder and piped natural gas", "nature": "Items", "level": 5, "code": "A.04.04.02.01.01", "leaf": "Y", "indent": 24, "weight": 1.98137, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 320, "parent": 313, "name": "Liquid fuels", "nature": "Classes", "level": 3, "code": "A.04.04.03", "leaf": "N", "indent": 16, "weight": 0.00972, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 321, "parent": 320, "name": "Liquid fuels", "nature": "Sub-classes", "level": 4, "code": "A.04.04.03.01", "leaf": "N", "indent": 20, "weight": 0.00972, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 322, "parent": 321, "name": "Kerosene", "nature": "Items", "level": 5, "code": "A.04.04.03.01.01", "leaf": "Y", "indent": 24, "weight": 0.0053, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 323, "parent": 321, "name": "Kerosene PDS", "nature": "Items", "level": 5, "code": "A.04.04.03.01.02", "leaf": "Y", "indent": 24, "weight": 0.00442, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 324, "parent": 313, "name": "Solid fuels", "nature": "Classes", "level": 3, "code": "A.04.04.04", "leaf": "N", "indent": 16, "weight": 1.04265, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 325, "parent": 324, "name": "Coal", "nature": "Sub-classes", "level": 4, "code": "A.04.04.04.01", "leaf": "N", "indent": 20, "weight": 0.00743, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 326, "parent": 325, "name": "Coal", "nature": "Items", "level": 5, "code": "A.04.04.04.01.01", "leaf": "Y", "indent": 24, "weight": 0.00743, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 327, "parent": 324, "name": "Firewood and chips", "nature": "Sub-classes", "level": 4, "code": "A.04.04.04.02", "leaf": "N", "indent": 20, "weight": 0.87183, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 328, "parent": 327, "name": "Firewood and chips", "nature": "Items", "level": 5, "code": "A.04.04.04.02.01", "leaf": "Y", "indent": 24, "weight": 0.87183, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 329, "parent": 324, "name": "Charcoal", "nature": "Sub-classes", "level": 4, "code": "A.04.04.04.03", "leaf": "N", "indent": 20, "weight": 0.0028, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 330, "parent": 329, "name": "Charcoal", "nature": "Items", "level": 5, "code": "A.04.04.04.03.01", "leaf": "Y", "indent": 24, "weight": 0.0028, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 331, "parent": 324, "name": "Other solid fuels", "nature": "Sub-classes", "level": 4, "code": "A.04.04.04.04", "leaf": "N", "indent": 20, "weight": 0.16059, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 332, "parent": 331, "name": "Dung cake", "nature": "Items", "level": 5, "code": "A.04.04.04.04.01", "leaf": "Y", "indent": 24, "weight": 0.14686, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 333, "parent": 331, "name": "Fuel (biogas and gobar gas)", "nature": "Items", "level": 5, "code": "A.04.04.04.04.02", "leaf": "Y", "indent": 24, "weight": 0.01373, "division": "Housing, water, electricity, gas and other fuels"}, {"id": 334, "parent": 0, "name": "Furnishings, household equipment and routine household maintenance", "nature": "Divisions", "level": 1, "code": "A.05", "leaf": "N", "indent": 8, "weight": 4.46939, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 335, "parent": 334, "name": "Furniture, furnishings, and loose carpets", "nature": "Groups", "level": 2, "code": "A.05.01", "leaf": "N", "indent": 12, "weight": 0.43103, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 336, "parent": 335, "name": "Furniture, furnishings and loose carpets", "nature": "Classes", "level": 3, "code": "A.05.01.01", "leaf": "N", "indent": 16, "weight": 0.43104, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 337, "parent": 336, "name": "Household furniture", "nature": "Sub-classes", "level": 4, "code": "A.05.01.01.01", "leaf": "N", "indent": 20, "weight": 0.27264, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 338, "parent": 337, "name": "Chair, stool, bench and table", "nature": "Items", "level": 5, "code": "A.05.01.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.10698, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 339, "parent": 337, "name": "Almirah and dressing table", "nature": "Items", "level": 5, "code": "A.05.01.01.01.02", "leaf": "Y", "indent": 24, "weight": 0.05508, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 340, "parent": 337, "name": "Bedstead", "nature": "Items", "level": 5, "code": "A.05.01.01.01.03", "leaf": "Y", "indent": 24, "weight": 0.06527, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 341, "parent": 337, "name": "Other furniture and fixtures", "nature": "Items", "level": 5, "code": "A.05.01.01.01.04", "leaf": "Y", "indent": 24, "weight": 0.04531, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 342, "parent": 336, "name": "Lighting equipment", "nature": "Sub-classes", "level": 4, "code": "A.05.01.01.02", "leaf": "N", "indent": 20, "weight": 0.11454, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 343, "parent": 342, "name": "Lantern, lamp, electric lampshade and emergency light", "nature": "Items", "level": 5, "code": "A.05.01.01.02.01", "leaf": "Y", "indent": 24, "weight": 0.0216, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 344, "parent": 342, "name": "Other electric bulb, tubelight and decorative lights", "nature": "Items", "level": 5, "code": "A.05.01.01.02.02", "leaf": "Y", "indent": 24, "weight": 0.09294, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 345, "parent": 336, "name": "Furnishings, loose carpets and rugs", "nature": "Sub-classes", "level": 4, "code": "A.05.01.01.03", "leaf": "N", "indent": 20, "weight": 0.04386, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 346, "parent": 345, "name": "Carpet, daree and other floor mattings", "nature": "Items", "level": 5, "code": "A.05.01.01.03.01", "leaf": "Y", "indent": 24, "weight": 0.03548, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 347, "parent": 345, "name": "Paintings, drawings and engravings", "nature": "Items", "level": 5, "code": "A.05.01.01.03.02", "leaf": "Y", "indent": 24, "weight": 0.00838, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 348, "parent": 334, "name": "Household textiles", "nature": "Groups", "level": 2, "code": "A.05.02", "leaf": "N", "indent": 12, "weight": 0.35602, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 349, "parent": 348, "name": "Household textiles", "nature": "Classes", "level": 3, "code": "A.05.02.01", "leaf": "N", "indent": 16, "weight": 0.35602, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 350, "parent": 349, "name": "Furnishing fabrics and curtains", "nature": "Sub-classes", "level": 4, "code": "A.05.02.01.01", "leaf": "N", "indent": 20, "weight": 0.01435, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 351, "parent": 350, "name": "Cloth for upholstery, curtains, tablecloth etc.", "nature": "Items", "level": 5, "code": "A.05.02.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.01435, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 352, "parent": 349, "name": "Bed linen and bedding", "nature": "Sub-classes", "level": 4, "code": "A.05.02.01.02", "leaf": "N", "indent": 20, "weight": 0.34167, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 353, "parent": 352, "name": "Bed sheet and bed cover", "nature": "Items", "level": 5, "code": "A.05.02.01.02.01", "leaf": "Y", "indent": 24, "weight": 0.14366, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 354, "parent": 352, "name": "Rug and blanket", "nature": "Items", "level": 5, "code": "A.05.02.01.02.02", "leaf": "Y", "indent": 24, "weight": 0.10116, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 355, "parent": 352, "name": "Pillow and cushion", "nature": "Items", "level": 5, "code": "A.05.02.01.02.03", "leaf": "Y", "indent": 24, "weight": 0.02776, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 356, "parent": 352, "name": "Quilt and mattress", "nature": "Items", "level": 5, "code": "A.05.02.01.02.04", "leaf": "Y", "indent": 24, "weight": 0.02905, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 357, "parent": 352, "name": "Mosquito net", "nature": "Items", "level": 5, "code": "A.05.02.01.02.05", "leaf": "Y", "indent": 24, "weight": 0.03196, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 358, "parent": 352, "name": "Bedding", "nature": "Items", "level": 5, "code": "A.05.02.01.02.06", "leaf": "Y", "indent": 24, "weight": 0.00808, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 359, "parent": 334, "name": "Household appliances", "nature": "Groups", "level": 2, "code": "A.05.03", "leaf": "N", "indent": 12, "weight": 0.74193, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 360, "parent": 359, "name": "Major electric and other household appliances", "nature": "Classes", "level": 3, "code": "A.05.03.01", "leaf": "N", "indent": 16, "weight": 0.40252, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 361, "parent": 360, "name": "Major kitchen appliances", "nature": "Sub-classes", "level": 4, "code": "A.05.03.01.01", "leaf": "N", "indent": 20, "weight": 0.13121, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 362, "parent": 361, "name": "Refrigerator/freezers", "nature": "Items", "level": 5, "code": "A.05.03.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.08492, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 363, "parent": 361, "name": "stove, gas burner and induction", "nature": "Items", "level": 5, "code": "A.05.03.01.01.02", "leaf": "Y", "indent": 24, "weight": 0.04629, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 364, "parent": 360, "name": "Major laundry appliances", "nature": "Sub-classes", "level": 4, "code": "A.05.03.01.02", "leaf": "N", "indent": 20, "weight": 0.04992, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 365, "parent": 364, "name": "Washing machine", "nature": "Items", "level": 5, "code": "A.05.03.01.02.01", "leaf": "Y", "indent": 24, "weight": 0.04992, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 366, "parent": 360, "name": "Heaters and air conditioners", "nature": "Sub-classes", "level": 4, "code": "A.05.03.01.03", "leaf": "N", "indent": 20, "weight": 0.13007, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 367, "parent": 366, "name": "Air conditioner", "nature": "Items", "level": 5, "code": "A.05.03.01.03.01", "leaf": "Y", "indent": 24, "weight": 0.0446, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 368, "parent": 366, "name": "Air cooler", "nature": "Items", "level": 5, "code": "A.05.03.01.03.02", "leaf": "Y", "indent": 24, "weight": 0.06523, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 369, "parent": 366, "name": "Geysers and sterilizers", "nature": "Items", "level": 5, "code": "A.05.03.01.03.03", "leaf": "Y", "indent": 24, "weight": 0.01287, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 370, "parent": 366, "name": "Electric air heaters and blowers", "nature": "Items", "level": 5, "code": "A.05.03.01.03.04", "leaf": "Y", "indent": 24, "weight": 0.00495, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 371, "parent": 366, "name": "Ventilation system such as exhaust, chimney, etc.", "nature": "Items", "level": 5, "code": "A.05.03.01.03.05", "leaf": "Y", "indent": 24, "weight": 0.00242, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 372, "parent": 360, "name": "Other major household appliances", "nature": "Sub-classes", "level": 4, "code": "A.05.03.01.04", "leaf": "N", "indent": 20, "weight": 0.09132, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 373, "parent": 372, "name": "Water purifier", "nature": "Items", "level": 5, "code": "A.05.03.01.04.01", "leaf": "Y", "indent": 24, "weight": 0.0214, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 374, "parent": 372, "name": "Inverter, generators and stabilizers", "nature": "Items", "level": 5, "code": "A.05.03.01.04.02", "leaf": "Y", "indent": 24, "weight": 0.02052, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 375, "parent": 372, "name": "Sewing machine", "nature": "Items", "level": 5, "code": "A.05.03.01.04.03", "leaf": "Y", "indent": 24, "weight": 0.01249, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 376, "parent": 372, "name": "Air purifier", "nature": "Items", "level": 5, "code": "A.05.03.01.04.04", "leaf": "Y", "indent": 24, "weight": 0.00158, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 377, "parent": 372, "name": "Other machines for household work", "nature": "Items", "level": 5, "code": "A.05.03.01.04.05", "leaf": "Y", "indent": 24, "weight": 0.00528, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 378, "parent": 372, "name": "Other durables", "nature": "Items", "level": 5, "code": "A.05.03.01.04.06", "leaf": "Y", "indent": 24, "weight": 0.03005, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 379, "parent": 359, "name": "Small household appliances", "nature": "Classes", "level": 3, "code": "A.05.03.02", "leaf": "N", "indent": 16, "weight": 0.33938, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 380, "parent": 379, "name": "Small appliances for the cooking and processing of food", "nature": "Sub-classes", "level": 4, "code": "A.05.03.02.01", "leaf": "N", "indent": 20, "weight": 0.08661, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 381, "parent": 380, "name": "Mixer/grinder, juicer and food processor", "nature": "Items", "level": 5, "code": "A.05.03.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.06304, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 382, "parent": 380, "name": "Other cooking/ household appliances", "nature": "Items", "level": 5, "code": "A.05.03.02.01.02", "leaf": "Y", "indent": 24, "weight": 0.02357, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 383, "parent": 379, "name": "Other small household appliances", "nature": "Sub-classes", "level": 4, "code": "A.05.03.02.02", "leaf": "N", "indent": 20, "weight": 0.25277, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 384, "parent": 383, "name": "Electric fan", "nature": "Items", "level": 5, "code": "A.05.03.02.02.01", "leaf": "Y", "indent": 24, "weight": 0.14948, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 385, "parent": 383, "name": "Bathroom and sanitary equipment", "nature": "Items", "level": 5, "code": "A.05.03.02.02.02", "leaf": "Y", "indent": 24, "weight": 0.06858, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 386, "parent": 383, "name": "Electric iron, heater, toaster, micro-oven, electric kettle, vacuum cleaner and  other electric heating appliances", "nature": "Items", "level": 5, "code": "A.05.03.02.02.03", "leaf": "Y", "indent": 24, "weight": 0.03471, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 387, "parent": 334, "name": "Glassware, tableware and household utensils", "nature": "Groups", "level": 2, "code": "A.05.04", "leaf": "N", "indent": 12, "weight": 0.55708, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 388, "parent": 387, "name": "Glassware, tableware and household utensils", "nature": "Classes", "level": 3, "code": "A.05.04.01", "leaf": "N", "indent": 16, "weight": 0.55709, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 389, "parent": 388, "name": "Glassware, crystal ware, ceramic ware and china ware", "nature": "Sub-classes", "level": 4, "code": "A.05.04.01.01", "leaf": "N", "indent": 20, "weight": 0.02463, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 390, "parent": 389, "name": "Glassware", "nature": "Items", "level": 5, "code": "A.05.04.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.02463, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 391, "parent": 388, "name": "Kitchen utensils and articles", "nature": "Sub-classes", "level": 4, "code": "A.05.04.01.02", "leaf": "N", "indent": 20, "weight": 0.53246, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 392, "parent": 391, "name": "Bucket and other plastic goods", "nature": "Items", "level": 5, "code": "A.05.04.01.02.01", "leaf": "Y", "indent": 24, "weight": 0.19518, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 393, "parent": 391, "name": "Stainless steel utensils", "nature": "Items", "level": 5, "code": "A.05.04.01.02.02", "leaf": "Y", "indent": 24, "weight": 0.1537, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 394, "parent": 391, "name": "Water bottle/feeding bottle", "nature": "Items", "level": 5, "code": "A.05.04.01.02.03", "leaf": "Y", "indent": 24, "weight": 0.0281, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 395, "parent": 391, "name": "Casseroles, thermos, flask and thermoware", "nature": "Items", "level": 5, "code": "A.05.04.01.02.04", "leaf": "Y", "indent": 24, "weight": 0.01679, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 396, "parent": 391, "name": "Other metal utensils (non-stick cookware, etc.)", "nature": "Items", "level": 5, "code": "A.05.04.01.02.05", "leaf": "Y", "indent": 24, "weight": 0.03363, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 397, "parent": 391, "name": "Other crockery and utensils", "nature": "Items", "level": 5, "code": "A.05.04.01.02.06", "leaf": "Y", "indent": 24, "weight": 0.04814, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 398, "parent": 391, "name": "Pressure cooker/ pressure pan", "nature": "Items", "level": 5, "code": "A.05.04.01.02.07", "leaf": "Y", "indent": 24, "weight": 0.05692, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 399, "parent": 334, "name": "Tools and equipment for house and garden", "nature": "Groups", "level": 2, "code": "A.05.05", "leaf": "N", "indent": 12, "weight": 0.2383, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 400, "parent": 399, "name": "Non-motorized tools and miscellaneous accessories", "nature": "Classes", "level": 3, "code": "A.05.05.01", "leaf": "N", "indent": 16, "weight": 0.2383, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 401, "parent": 400, "name": "Miscellaneous accessories", "nature": "Sub-classes", "level": 4, "code": "A.05.05.01.01", "leaf": "N", "indent": 20, "weight": 0.2383, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 402, "parent": 401, "name": "LED bulb, CFL bulbs", "nature": "Items", "level": 5, "code": "A.05.05.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.17387, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 403, "parent": 401, "name": "Electric batteries", "nature": "Items", "level": 5, "code": "A.05.05.01.01.02", "leaf": "Y", "indent": 24, "weight": 0.03286, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 404, "parent": 401, "name": "Other minor durable-type goods", "nature": "Items", "level": 5, "code": "A.05.05.01.01.03", "leaf": "Y", "indent": 24, "weight": 0.03157, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 405, "parent": 334, "name": "Goods and services for routine household maintenance", "nature": "Groups", "level": 2, "code": "A.05.06", "leaf": "N", "indent": 12, "weight": 2.14504, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 406, "parent": 405, "name": "Non-durable household goods", "nature": "Classes", "level": 3, "code": "A.05.06.01", "leaf": "N", "indent": 16, "weight": 1.49897, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 407, "parent": 406, "name": "Household cleaning and maintenance products", "nature": "Sub-classes", "level": 4, "code": "A.05.06.01.01", "leaf": "N", "indent": 20, "weight": 0.85282, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 408, "parent": 407, "name": "Washing soap/soda/powder/liquid detergent", "nature": "Items", "level": 5, "code": "A.05.06.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.57813, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 409, "parent": 407, "name": "Floor cleaner, toilet cleaner", "nature": "Items", "level": 5, "code": "A.05.06.01.01.02", "leaf": "Y", "indent": 24, "weight": 0.19196, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 410, "parent": 407, "name": "Other washing requisites", "nature": "Items", "level": 5, "code": "A.05.06.01.01.03", "leaf": "Y", "indent": 24, "weight": 0.08273, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 411, "parent": 406, "name": "Other non-durable household goods", "nature": "Sub-classes", "level": 4, "code": "A.05.06.01.02", "leaf": "N", "indent": 20, "weight": 0.64615, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 412, "parent": 411, "name": "Incense (agarbatti) and room freshener", "nature": "Items", "level": 5, "code": "A.05.06.01.02.01", "leaf": "Y", "indent": 24, "weight": 0.16634, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 413, "parent": 411, "name": "Mosquito repellent, insecticide, anti-rodent, etc.", "nature": "Items", "level": 5, "code": "A.05.06.01.02.02", "leaf": "Y", "indent": 24, "weight": 0.13976, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 414, "parent": 411, "name": "Earthenware, paperware, thermocol plates, etc.", "nature": "Items", "level": 5, "code": "A.05.06.01.02.03", "leaf": "Y", "indent": 24, "weight": 0.04171, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 415, "parent": 411, "name": "Matchbox", "nature": "Items", "level": 5, "code": "A.05.06.01.02.04", "leaf": "Y", "indent": 24, "weight": 0.0338, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 416, "parent": 411, "name": "Candle", "nature": "Items", "level": 5, "code": "A.05.06.01.02.05", "leaf": "Y", "indent": 24, "weight": 0.0242, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 417, "parent": 411, "name": "Other petty articles", "nature": "Items", "level": 5, "code": "A.05.06.01.02.06", "leaf": "Y", "indent": 24, "weight": 0.24034, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 418, "parent": 405, "name": "Domestic services and household services", "nature": "Classes", "level": 3, "code": "A.05.06.02", "leaf": "N", "indent": 16, "weight": 0.64606, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 419, "parent": 418, "name": "Domestic services provided by paid staff", "nature": "Sub-classes", "level": 4, "code": "A.05.06.02.01", "leaf": "N", "indent": 20, "weight": 0.17963, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 420, "parent": 419, "name": "Domestic helper/cook", "nature": "Items", "level": 5, "code": "A.05.06.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.14838, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 421, "parent": 419, "name": "Driver", "nature": "Items", "level": 5, "code": "A.05.06.02.01.02", "leaf": "Y", "indent": 24, "weight": 0.02606, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 422, "parent": 419, "name": "Attendant, babysitter", "nature": "Items", "level": 5, "code": "A.05.06.02.01.03", "leaf": "Y", "indent": 24, "weight": 0.00519, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 423, "parent": 418, "name": "Other consumer services excluding conveyance", "nature": "Sub-classes", "level": 4, "code": "A.05.06.02.02", "leaf": "N", "indent": 20, "weight": 0.46643, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 424, "parent": 423, "name": "Other consumer services excluding conveyance", "nature": "Items", "level": 5, "code": "A.05.06.02.02.01", "leaf": "Y", "indent": 24, "weight": 0.46643, "division": "Furnishings, household equipment and routine household maintenance"}, {"id": 425, "parent": 0, "name": "Health", "nature": "Divisions", "level": 1, "code": "A.06", "leaf": "N", "indent": 8, "weight": 6.10026, "division": "Health"}, {"id": 426, "parent": 425, "name": "Medicines and health products", "nature": "Groups", "level": 2, "code": "A.06.01", "leaf": "N", "indent": 12, "weight": 3.89675, "division": "Health"}, {"id": 427, "parent": 426, "name": "Medicines", "nature": "Classes", "level": 3, "code": "A.06.01.01", "leaf": "N", "indent": 16, "weight": 3.76384, "division": "Health"}, {"id": 428, "parent": 427, "name": "Medicines and vaccines", "nature": "Sub-classes", "level": 4, "code": "A.06.01.01.01", "leaf": "N", "indent": 20, "weight": 3.72522, "division": "Health"}, {"id": 429, "parent": 428, "name": "Medicine", "nature": "Items", "level": 5, "code": "A.06.01.01.01.01", "leaf": "Y", "indent": 24, "weight": 3.72522, "division": "Health"}, {"id": 430, "parent": 427, "name": "Health supplements", "nature": "Sub-classes", "level": 4, "code": "A.06.01.01.02", "leaf": "N", "indent": 20, "weight": 0.03862, "division": "Health"}, {"id": 431, "parent": 430, "name": "Health supplements (chawanprash)", "nature": "Items", "level": 5, "code": "A.06.01.01.02.01", "leaf": "Y", "indent": 24, "weight": 0.03862, "division": "Health"}, {"id": 432, "parent": 426, "name": "Medical products", "nature": "Classes", "level": 3, "code": "A.06.01.02", "leaf": "N", "indent": 16, "weight": 0.04309, "division": "Health"}, {"id": 433, "parent": 432, "name": "Medical diagnostic products", "nature": "Sub-classes", "level": 4, "code": "A.06.01.02.01", "leaf": "N", "indent": 20, "weight": 0.01963, "division": "Health"}, {"id": 434, "parent": 433, "name": "Other medical equipment", "nature": "Items", "level": 5, "code": "A.06.01.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.01963, "division": "Health"}, {"id": 435, "parent": 432, "name": "Family planning devices", "nature": "Sub-classes", "level": 4, "code": "A.06.01.02.02", "leaf": "N", "indent": 20, "weight": 0.01854, "division": "Health"}, {"id": 436, "parent": 435, "name": "Family planning devices", "nature": "Items", "level": 5, "code": "A.06.01.02.02.01", "leaf": "Y", "indent": 24, "weight": 0.01854, "division": "Health"}, {"id": 437, "parent": 432, "name": "Treatment devices for personal use", "nature": "Sub-classes", "level": 4, "code": "A.06.01.02.03", "leaf": "N", "indent": 20, "weight": 0.00492, "division": "Health"}, {"id": 438, "parent": 437, "name": "Nebulizer", "nature": "Items", "level": 5, "code": "A.06.01.02.03.01", "leaf": "Y", "indent": 24, "weight": 0.00492, "division": "Health"}, {"id": 439, "parent": 426, "name": "Assistive products", "nature": "Classes", "level": 3, "code": "A.06.01.03", "leaf": "N", "indent": 16, "weight": 0.08982, "division": "Health"}, {"id": 440, "parent": 439, "name": "Assistive products for vision", "nature": "Sub-classes", "level": 4, "code": "A.06.01.03.01", "leaf": "N", "indent": 20, "weight": 0.08, "division": "Health"}, {"id": 441, "parent": 440, "name": "Spectacles/goggles, contact lenses", "nature": "Items", "level": 5, "code": "A.06.01.03.01.01", "leaf": "Y", "indent": 24, "weight": 0.08, "division": "Health"}, {"id": 442, "parent": 439, "name": "Assistive products for hearing and communication", "nature": "Sub-classes", "level": 4, "code": "A.06.01.03.02", "leaf": "N", "indent": 20, "weight": 0.0043, "division": "Health"}, {"id": 443, "parent": 442, "name": "Hearing aids and orthopaedic equipment", "nature": "Items", "level": 5, "code": "A.06.01.03.02.01", "leaf": "Y", "indent": 24, "weight": 0.0043, "division": "Health"}, {"id": 444, "parent": 439, "name": "Assistive products for mobility and daily living", "nature": "Sub-classes", "level": 4, "code": "A.06.01.03.03", "leaf": "N", "indent": 20, "weight": 0.00552, "division": "Health"}, {"id": 445, "parent": 444, "name": "Massager", "nature": "Items", "level": 5, "code": "A.06.01.03.03.01", "leaf": "Y", "indent": 24, "weight": 0.00389, "division": "Health"}, {"id": 446, "parent": 444, "name": "Wheelchair", "nature": "Items", "level": 5, "code": "A.06.01.03.03.02", "leaf": "Y", "indent": 24, "weight": 0.00163, "division": "Health"}, {"id": 447, "parent": 425, "name": "Outpatient care services", "nature": "Groups", "level": 2, "code": "A.06.02", "leaf": "N", "indent": 12, "weight": 1.09901, "division": "Health"}, {"id": 448, "parent": 447, "name": "Other outpatient care services", "nature": "Classes", "level": 3, "code": "A.06.02.01", "leaf": "N", "indent": 16, "weight": 1.09901, "division": "Health"}, {"id": 449, "parent": 448, "name": "Outpatient curative and rehabilitative services", "nature": "Sub-classes", "level": 4, "code": "A.06.02.01.01", "leaf": "N", "indent": 20, "weight": 1.09901, "division": "Health"}, {"id": 450, "parent": 449, "name": "Doctor's/surgeon's fee", "nature": "Items", "level": 5, "code": "A.06.02.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.87916, "division": "Health"}, {"id": 451, "parent": 449, "name": "Other medical expenses", "nature": "Items", "level": 5, "code": "A.06.02.01.01.02", "leaf": "Y", "indent": 24, "weight": 0.21985, "division": "Health"}, {"id": 452, "parent": 425, "name": "Inpatient care services", "nature": "Groups", "level": 2, "code": "A.06.03", "leaf": "N", "indent": 12, "weight": 0.4948, "division": "Health"}, {"id": 453, "parent": 452, "name": "Inpatient curative and rehabilitative services", "nature": "Classes", "level": 3, "code": "A.06.03.01", "leaf": "N", "indent": 16, "weight": 0.4948, "division": "Health"}, {"id": 454, "parent": 453, "name": "Inpatient curative and rehabilitative services", "nature": "Sub-classes", "level": 4, "code": "A.06.03.01.01", "leaf": "N", "indent": 20, "weight": 0.4948, "division": "Health"}, {"id": 455, "parent": 454, "name": "Hospital and nursing home charges", "nature": "Items", "level": 5, "code": "A.06.03.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.4948, "division": "Health"}, {"id": 456, "parent": 425, "name": "Other health services", "nature": "Groups", "level": 2, "code": "A.06.04", "leaf": "N", "indent": 12, "weight": 0.6097, "division": "Health"}, {"id": 457, "parent": 456, "name": "Diagnostic imaging services and medical laboratory services", "nature": "Classes", "level": 3, "code": "A.06.04.01", "leaf": "N", "indent": 16, "weight": 0.6097, "division": "Health"}, {"id": 458, "parent": 457, "name": "Diagnostic imaging services and medical laboratory services", "nature": "Sub-classes", "level": 4, "code": "A.06.04.01.01", "leaf": "N", "indent": 20, "weight": 0.6097, "division": "Health"}, {"id": 459, "parent": 458, "name": "X-ray, ECG and pathological test", "nature": "Items", "level": 5, "code": "A.06.04.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.6097, "division": "Health"}, {"id": 460, "parent": 0, "name": "Transport", "nature": "Divisions", "level": 1, "code": "A.07", "leaf": "N", "indent": 8, "weight": 8.79611, "division": "Transport"}, {"id": 461, "parent": 460, "name": "Purchase of vehicles", "nature": "Groups", "level": 2, "code": "A.07.01", "leaf": "N", "indent": 12, "weight": 1.18446, "division": "Transport"}, {"id": 462, "parent": 461, "name": "Motor cars", "nature": "Classes", "level": 3, "code": "A.07.01.01", "leaf": "N", "indent": 16, "weight": 0.46647, "division": "Transport"}, {"id": 463, "parent": 462, "name": "Motor car and jeep", "nature": "Sub-classes", "level": 4, "code": "A.07.01.01.01", "leaf": "N", "indent": 20, "weight": 0.46647, "division": "Transport"}, {"id": 464, "parent": 463, "name": "Motor car and jeep", "nature": "Items", "level": 5, "code": "A.07.01.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.46647, "division": "Transport"}, {"id": 465, "parent": 461, "name": "Motorcycles", "nature": "Classes", "level": 3, "code": "A.07.01.02", "leaf": "N", "indent": 16, "weight": 0.65811, "division": "Transport"}, {"id": 466, "parent": 465, "name": "Motor cycle and scooter", "nature": "Sub-classes", "level": 4, "code": "A.07.01.02.01", "leaf": "N", "indent": 20, "weight": 0.65811, "division": "Transport"}, {"id": 467, "parent": 466, "name": "Motor cycle and scooter", "nature": "Items", "level": 5, "code": "A.07.01.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.65811, "division": "Transport"}, {"id": 468, "parent": 461, "name": "Bicycles", "nature": "Classes", "level": 3, "code": "A.07.01.03", "leaf": "N", "indent": 16, "weight": 0.05988, "division": "Transport"}, {"id": 469, "parent": 468, "name": "Bicycle", "nature": "Sub-classes", "level": 4, "code": "A.07.01.03.01", "leaf": "N", "indent": 20, "weight": 0.05988, "division": "Transport"}, {"id": 470, "parent": 469, "name": "Bicycle", "nature": "Items", "level": 5, "code": "A.07.01.03.01.01", "leaf": "Y", "indent": 24, "weight": 0.05988, "division": "Transport"}, {"id": 471, "parent": 460, "name": "Operation of personal transport equipment", "nature": "Groups", "level": 2, "code": "A.07.02", "leaf": "N", "indent": 12, "weight": 5.03698, "division": "Transport"}, {"id": 472, "parent": 471, "name": "Parts and accessories for personal transport equipment", "nature": "Classes", "level": 3, "code": "A.07.02.01", "leaf": "N", "indent": 16, "weight": 0.1915, "division": "Transport"}, {"id": 473, "parent": 472, "name": "Tyres and tubes", "nature": "Sub-classes", "level": 4, "code": "A.07.02.01.01", "leaf": "N", "indent": 20, "weight": 0.15367, "division": "Transport"}, {"id": 474, "parent": 473, "name": "Tyres and tubes", "nature": "Items", "level": 5, "code": "A.07.02.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.15367, "division": "Transport"}, {"id": 475, "parent": 472, "name": "Parts for personal transport equipment", "nature": "Sub-classes", "level": 4, "code": "A.07.02.01.02", "leaf": "N", "indent": 20, "weight": 0.00471, "division": "Transport"}, {"id": 476, "parent": 475, "name": "Other transport equipment", "nature": "Items", "level": 5, "code": "A.07.02.01.02.01", "leaf": "Y", "indent": 24, "weight": 0.00471, "division": "Transport"}, {"id": 477, "parent": 472, "name": "Accessories for personal transport equipment", "nature": "Sub-classes", "level": 4, "code": "A.07.02.01.03", "leaf": "N", "indent": 20, "weight": 0.03312, "division": "Transport"}, {"id": 478, "parent": 477, "name": "Helmet", "nature": "Items", "level": 5, "code": "A.07.02.01.03.01", "leaf": "Y", "indent": 24, "weight": 0.03312, "division": "Transport"}, {"id": 479, "parent": 471, "name": "Fuels and lubricants for personal transport equipment", "nature": "Classes", "level": 3, "code": "A.07.02.02", "leaf": "N", "indent": 16, "weight": 4.84548, "division": "Transport"}, {"id": 480, "parent": 479, "name": "Diesel", "nature": "Sub-classes", "level": 4, "code": "A.07.02.02.01", "leaf": "N", "indent": 20, "weight": 0.31671, "division": "Transport"}, {"id": 481, "parent": 480, "name": "Diesel", "nature": "Items", "level": 5, "code": "A.07.02.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.31671, "division": "Transport"}, {"id": 482, "parent": 479, "name": "Petrol", "nature": "Sub-classes", "level": 4, "code": "A.07.02.02.02", "leaf": "N", "indent": 20, "weight": 4.48877, "division": "Transport"}, {"id": 483, "parent": 482, "name": "Petrol", "nature": "Items", "level": 5, "code": "A.07.02.02.02.01", "leaf": "Y", "indent": 24, "weight": 4.48877, "division": "Transport"}, {"id": 484, "parent": 479, "name": "Other fuels for personal transport equipment", "nature": "Sub-classes", "level": 4, "code": "A.07.02.02.03", "leaf": "N", "indent": 20, "weight": 0.04, "division": "Transport"}, {"id": 485, "parent": 484, "name": "Other natural gas (CNG)", "nature": "Items", "level": 5, "code": "A.07.02.02.03.01", "leaf": "Y", "indent": 24, "weight": 0.04, "division": "Transport"}, {"id": 486, "parent": 460, "name": "Passenger transport services", "nature": "Groups", "level": 2, "code": "A.07.03", "leaf": "N", "indent": 12, "weight": 2.56702, "division": "Transport"}, {"id": 487, "parent": 486, "name": "Passenger transport by railway", "nature": "Classes", "level": 3, "code": "A.07.03.01", "leaf": "N", "indent": 16, "weight": 0.86954, "division": "Transport"}, {"id": 488, "parent": 487, "name": "Passenger transport by train", "nature": "Sub-classes", "level": 4, "code": "A.07.03.01.01", "leaf": "N", "indent": 20, "weight": 0.1858, "division": "Transport"}, {"id": 489, "parent": 488, "name": "Rail fare", "nature": "Items", "level": 5, "code": "A.07.03.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.1858, "division": "Transport"}, {"id": 490, "parent": 487, "name": "Passenger transport by rapid transit and tram", "nature": "Sub-classes", "level": 4, "code": "A.07.03.01.02", "leaf": "N", "indent": 20, "weight": 0.68374, "division": "Transport"}, {"id": 491, "parent": 490, "name": "Bus/tram fare: occasional", "nature": "Items", "level": 5, "code": "A.07.03.01.02.01", "leaf": "Y", "indent": 24, "weight": 0.68374, "division": "Transport"}, {"id": 492, "parent": 486, "name": "Passenger transport by road", "nature": "Classes", "level": 3, "code": "A.07.03.02", "leaf": "N", "indent": 16, "weight": 1.66642, "division": "Transport"}, {"id": 493, "parent": 492, "name": "Passenger transport by bus and coach", "nature": "Sub-classes", "level": 4, "code": "A.07.03.02.01", "leaf": "N", "indent": 20, "weight": 0.15799, "division": "Transport"}, {"id": 494, "parent": 493, "name": "Bus/tram fare for commuting to work: daily", "nature": "Items", "level": 5, "code": "A.07.03.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.11772, "division": "Transport"}, {"id": 495, "parent": 493, "name": "Bus fare for commuting to work: periodic", "nature": "Items", "level": 5, "code": "A.07.03.02.01.02", "leaf": "Y", "indent": 24, "weight": 0.04027, "division": "Transport"}, {"id": 496, "parent": 492, "name": "Passenger transport by taxi and hired vehicle with driver", "nature": "Sub-classes", "level": 4, "code": "A.07.03.02.02", "leaf": "N", "indent": 20, "weight": 0.18781, "division": "Transport"}, {"id": 497, "parent": 496, "name": "Taxi fare", "nature": "Items", "level": 5, "code": "A.07.03.02.02.01", "leaf": "Y", "indent": 24, "weight": 0.1136, "division": "Transport"}, {"id": 498, "parent": 496, "name": "Car/bus hired for ceremonial occasion, picnic, etc", "nature": "Items", "level": 5, "code": "A.07.03.02.02.02", "leaf": "Y", "indent": 24, "weight": 0.07421, "division": "Transport"}, {"id": 499, "parent": 492, "name": "Passenger transport for students to and from school", "nature": "Sub-classes", "level": 4, "code": "A.07.03.02.03", "leaf": "N", "indent": 20, "weight": 0.52988, "division": "Transport"}, {"id": 500, "parent": 499, "name": "Bus fare for school, college: periodic", "nature": "Items", "level": 5, "code": "A.07.03.02.03.01", "leaf": "Y", "indent": 24, "weight": 0.38162, "division": "Transport"}, {"id": 501, "parent": 499, "name": "Bus /tram fare for school, college: daily", "nature": "Items", "level": 5, "code": "A.07.03.02.03.02", "leaf": "Y", "indent": 24, "weight": 0.14826, "division": "Transport"}, {"id": 502, "parent": 492, "name": "Other passenger transport by road", "nature": "Sub-classes", "level": 4, "code": "A.07.03.02.04", "leaf": "N", "indent": 20, "weight": 0.79074, "division": "Transport"}, {"id": 503, "parent": 502, "name": "Auto-rickshaw/e-rickshaw fare", "nature": "Items", "level": 5, "code": "A.07.03.02.04.01", "leaf": "Y", "indent": 24, "weight": 0.70077, "division": "Transport"}, {"id": 504, "parent": 502, "name": "Rickshaw fare", "nature": "Items", "level": 5, "code": "A.07.03.02.04.02", "leaf": "Y", "indent": 24, "weight": 0.01111, "division": "Transport"}, {"id": 505, "parent": 502, "name": "Other conveyance expenses", "nature": "Items", "level": 5, "code": "A.07.03.02.04.03", "leaf": "Y", "indent": 24, "weight": 0.07886, "division": "Transport"}, {"id": 506, "parent": 486, "name": "Passenger transport by air", "nature": "Classes", "level": 3, "code": "A.07.03.03", "leaf": "N", "indent": 16, "weight": 0.02951, "division": "Transport"}, {"id": 507, "parent": 506, "name": "Passenger transport by air, domestic", "nature": "Sub-classes", "level": 4, "code": "A.07.03.03.01", "leaf": "N", "indent": 20, "weight": 0.02951, "division": "Transport"}, {"id": 508, "parent": 507, "name": "Airfare", "nature": "Items", "level": 5, "code": "A.07.03.03.01.01", "leaf": "Y", "indent": 24, "weight": 0.02951, "division": "Transport"}, {"id": 509, "parent": 486, "name": "Passenger transport by sea and inland waterway", "nature": "Classes", "level": 3, "code": "A.07.03.04", "leaf": "N", "indent": 16, "weight": 0.00155, "division": "Transport"}, {"id": 510, "parent": 509, "name": "Passenger transport by sea and inland waterway", "nature": "Sub-classes", "level": 4, "code": "A.07.03.04.01", "leaf": "N", "indent": 20, "weight": 0.00155, "division": "Transport"}, {"id": 511, "parent": 510, "name": "Steamer, boat fare", "nature": "Items", "level": 5, "code": "A.07.03.04.01.01", "leaf": "Y", "indent": 24, "weight": 0.00155, "division": "Transport"}, {"id": 512, "parent": 460, "name": "Transport services for goods", "nature": "Groups", "level": 2, "code": "A.07.04", "leaf": "N", "indent": 12, "weight": 0.00766, "division": "Transport"}, {"id": 513, "parent": 512, "name": "Postal and courier services", "nature": "Classes", "level": 3, "code": "A.07.04.01", "leaf": "N", "indent": 16, "weight": 0.00766, "division": "Transport"}, {"id": 514, "parent": 513, "name": "Courier and parcel delivery services", "nature": "Sub-classes", "level": 4, "code": "A.07.04.01.01", "leaf": "N", "indent": 20, "weight": 0.00766, "division": "Transport"}, {"id": 515, "parent": 514, "name": "Postage, couriers and money order", "nature": "Items", "level": 5, "code": "A.07.04.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.00766, "division": "Transport"}, {"id": 516, "parent": 0, "name": "Information and communication", "nature": "Divisions", "level": 1, "code": "A.08", "leaf": "N", "indent": 8, "weight": 3.60944, "division": "Information and communication"}, {"id": 517, "parent": 516, "name": "Information and communication equipment", "nature": "Groups", "level": 2, "code": "A.08.01", "leaf": "N", "indent": 12, "weight": 0.79058, "division": "Information and communication"}, {"id": 518, "parent": 517, "name": "Telephone instrument (landline)", "nature": "Classes", "level": 3, "code": "A.08.01.01", "leaf": "N", "indent": 16, "weight": 0.00102, "division": "Information and communication"}, {"id": 519, "parent": 518, "name": "Telephone instrument (landline)", "nature": "Sub-classes", "level": 4, "code": "A.08.01.01.01", "leaf": "N", "indent": 20, "weight": 0.00102, "division": "Information and communication"}, {"id": 520, "parent": 519, "name": "Telephone instrument (landline)", "nature": "Items", "level": 5, "code": "A.08.01.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.00102, "division": "Information and communication"}, {"id": 521, "parent": 517, "name": "Mobile handset", "nature": "Classes", "level": 3, "code": "A.08.01.02", "leaf": "N", "indent": 16, "weight": 0.56098, "division": "Information and communication"}, {"id": 522, "parent": 521, "name": "Mobile handset", "nature": "Sub-classes", "level": 4, "code": "A.08.01.02.01", "leaf": "N", "indent": 20, "weight": 0.56098, "division": "Information and communication"}, {"id": 523, "parent": 522, "name": "Mobile handset", "nature": "Items", "level": 5, "code": "A.08.01.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.56098, "division": "Information and communication"}, {"id": 524, "parent": 517, "name": "Information processing equipment", "nature": "Classes", "level": 3, "code": "A.08.01.03", "leaf": "N", "indent": 16, "weight": 0.03538, "division": "Information and communication"}, {"id": 525, "parent": 524, "name": "Computers, laptops and tablets including Software", "nature": "Sub-classes", "level": 4, "code": "A.08.01.03.01", "leaf": "N", "indent": 20, "weight": 0.03538, "division": "Information and communication"}, {"id": 526, "parent": 525, "name": "PC/ Laptop/ tablet and other peripherals incl. software", "nature": "Items", "level": 5, "code": "A.08.01.03.01.01", "leaf": "Y", "indent": 24, "weight": 0.03538, "division": "Information and communication"}, {"id": 527, "parent": 517, "name": "Audio-visual devices", "nature": "Classes", "level": 3, "code": "A.08.01.04", "leaf": "N", "indent": 16, "weight": 0.18264, "division": "Information and communication"}, {"id": 528, "parent": 527, "name": "Audio-visual devices", "nature": "Sub-classes", "level": 4, "code": "A.08.01.04.01", "leaf": "N", "indent": 20, "weight": 0.18264, "division": "Information and communication"}, {"id": 529, "parent": 528, "name": "Television", "nature": "Items", "level": 5, "code": "A.08.01.04.01.01", "leaf": "Y", "indent": 24, "weight": 0.11134, "division": "Information and communication"}, {"id": 530, "parent": 528, "name": "Headphones, earphones, earpods, airpods and bluetooth devices", "nature": "Items", "level": 5, "code": "A.08.01.04.01.02", "leaf": "Y", "indent": 24, "weight": 0.0713, "division": "Information and communication"}, {"id": 531, "parent": 517, "name": "Unrecorded recording media", "nature": "Classes", "level": 3, "code": "A.08.01.05", "leaf": "N", "indent": 16, "weight": 0.01056, "division": "Information and communication"}, {"id": 532, "parent": 531, "name": "Unrecorded recording media", "nature": "Sub-classes", "level": 4, "code": "A.08.01.05.01", "leaf": "N", "indent": 20, "weight": 0.01056, "division": "Information and communication"}, {"id": 533, "parent": 532, "name": "Pen-drive and external hard disk", "nature": "Items", "level": 5, "code": "A.08.01.05.01.01", "leaf": "Y", "indent": 24, "weight": 0.01056, "division": "Information and communication"}, {"id": 534, "parent": 516, "name": "Information and communication services", "nature": "Groups", "level": 2, "code": "A.08.02", "leaf": "N", "indent": 12, "weight": 2.81886, "division": "Information and communication"}, {"id": 535, "parent": 534, "name": "Internet access provision services and online storage services", "nature": "Classes", "level": 3, "code": "A.08.02.01", "leaf": "N", "indent": 16, "weight": 0.20441, "division": "Information and communication"}, {"id": 536, "parent": 535, "name": "Internet expenses", "nature": "Sub-classes", "level": 4, "code": "A.08.02.01.01", "leaf": "N", "indent": 20, "weight": 0.20441, "division": "Information and communication"}, {"id": 537, "parent": 536, "name": "Internet expenses", "nature": "Items", "level": 5, "code": "A.08.02.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.20441, "division": "Information and communication"}, {"id": 538, "parent": 534, "name": "Telephone charges: mobile and landline", "nature": "Classes", "level": 3, "code": "A.08.02.02", "leaf": "N", "indent": 16, "weight": 1.92469, "division": "Information and communication"}, {"id": 539, "parent": 538, "name": "Telephone charges: mobile and landline", "nature": "Sub-classes", "level": 4, "code": "A.08.02.02.01", "leaf": "N", "indent": 20, "weight": 1.92469, "division": "Information and communication"}, {"id": 540, "parent": 539, "name": "Telephone charges: mobile", "nature": "Items", "level": 5, "code": "A.08.02.02.01.01", "leaf": "Y", "indent": 24, "weight": 1.92039, "division": "Information and communication"}, {"id": 541, "parent": 539, "name": "Telephone charges: landline", "nature": "Items", "level": 5, "code": "A.08.02.02.01.02", "leaf": "Y", "indent": 24, "weight": 0.0043, "division": "Information and communication"}, {"id": 542, "parent": 534, "name": "Other information and communication services", "nature": "Classes", "level": 3, "code": "A.08.02.03", "leaf": "N", "indent": 16, "weight": 0.68976, "division": "Information and communication"}, {"id": 543, "parent": 542, "name": "Subscriptions to streaming services", "nature": "Sub-classes", "level": 4, "code": "A.08.02.03.01", "leaf": "N", "indent": 20, "weight": 0.68976, "division": "Information and communication"}, {"id": 544, "parent": 543, "name": "Cable TV/DTH/set top box", "nature": "Items", "level": 5, "code": "A.08.02.03.01.01", "leaf": "Y", "indent": 24, "weight": 0.64628, "division": "Information and communication"}, {"id": 545, "parent": 543, "name": "Online media service provider/streaming services", "nature": "Items", "level": 5, "code": "A.08.02.03.01.02", "leaf": "Y", "indent": 24, "weight": 0.04348, "division": "Information and communication"}, {"id": 546, "parent": 0, "name": "Recreation, sport and culture", "nature": "Divisions", "level": 1, "code": "A.09", "leaf": "N", "indent": 8, "weight": 1.51581, "division": "Recreation, sport and culture"}, {"id": 547, "parent": 546, "name": "Recreational durables", "nature": "Groups", "level": 2, "code": "A.09.01", "leaf": "N", "indent": 12, "weight": 0.00277, "division": "Recreation, sport and culture"}, {"id": 548, "parent": 547, "name": "Photographic and cinematographic equipment and optical instruments", "nature": "Classes", "level": 3, "code": "A.09.01.01", "leaf": "N", "indent": 16, "weight": 0.00277, "division": "Recreation, sport and culture"}, {"id": 549, "parent": 548, "name": "Camera and photographic equipment", "nature": "Sub-classes", "level": 4, "code": "A.09.01.01.01", "leaf": "N", "indent": 20, "weight": 0.00277, "division": "Recreation, sport and culture"}, {"id": 550, "parent": 549, "name": "Camera and photographic equipment", "nature": "Items", "level": 5, "code": "A.09.01.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.00277, "division": "Recreation, sport and culture"}, {"id": 551, "parent": 546, "name": "Other recreational goods", "nature": "Groups", "level": 2, "code": "A.09.02", "leaf": "N", "indent": 12, "weight": 0.1249, "division": "Recreation, sport and culture"}, {"id": 552, "parent": 551, "name": "Games, toys and hobby-related articles", "nature": "Classes", "level": 3, "code": "A.09.02.01", "leaf": "N", "indent": 16, "weight": 0.02349, "division": "Recreation, sport and culture"}, {"id": 553, "parent": 552, "name": "Other goods for recreation", "nature": "Sub-classes", "level": 4, "code": "A.09.02.01.01", "leaf": "N", "indent": 20, "weight": 0.02349, "division": "Recreation, sport and culture"}, {"id": 554, "parent": 553, "name": "Other goods for recreation", "nature": "Items", "level": 5, "code": "A.09.02.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.02349, "division": "Recreation, sport and culture"}, {"id": 555, "parent": 551, "name": "Sporting, camping and open-air recreation equipment", "nature": "Classes", "level": 3, "code": "A.09.02.02", "leaf": "N", "indent": 16, "weight": 0.10141, "division": "Recreation, sport and culture"}, {"id": 556, "parent": 555, "name": "Sporting equipment", "nature": "Sub-classes", "level": 4, "code": "A.09.02.02.01", "leaf": "N", "indent": 20, "weight": 0.10141, "division": "Recreation, sport and culture"}, {"id": 557, "parent": 556, "name": "Sports goods", "nature": "Items", "level": 5, "code": "A.09.02.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.07853, "division": "Recreation, sport and culture"}, {"id": 558, "parent": 556, "name": "Exercise equipment", "nature": "Items", "level": 5, "code": "A.09.02.02.01.02", "leaf": "Y", "indent": 24, "weight": 0.00463, "division": "Recreation, sport and culture"}, {"id": 559, "parent": 556, "name": "Other sports goods", "nature": "Items", "level": 5, "code": "A.09.02.02.01.03", "leaf": "Y", "indent": 24, "weight": 0.01825, "division": "Recreation, sport and culture"}, {"id": 560, "parent": 546, "name": "Garden products and pets", "nature": "Groups", "level": 2, "code": "A.09.03", "leaf": "N", "indent": 12, "weight": 0.15736, "division": "Recreation, sport and culture"}, {"id": 561, "parent": 560, "name": "Garden products, plants and flowers", "nature": "Classes", "level": 3, "code": "A.09.03.01", "leaf": "N", "indent": 16, "weight": 0.11393, "division": "Recreation, sport and culture"}, {"id": 562, "parent": 561, "name": "Plants, seeds and flowers", "nature": "Sub-classes", "level": 4, "code": "A.09.03.01.01", "leaf": "N", "indent": 20, "weight": 0.11393, "division": "Recreation, sport and culture"}, {"id": 563, "parent": 562, "name": "Flower (fresh)", "nature": "Items", "level": 5, "code": "A.09.03.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.11393, "division": "Recreation, sport and culture"}, {"id": 564, "parent": 560, "name": "Pets and pet products", "nature": "Classes", "level": 3, "code": "A.09.03.02", "leaf": "N", "indent": 16, "weight": 0.04343, "division": "Recreation, sport and culture"}, {"id": 565, "parent": 564, "name": "Pets", "nature": "Sub-classes", "level": 4, "code": "A.09.03.02.01", "leaf": "N", "indent": 20, "weight": 0.04343, "division": "Recreation, sport and culture"}, {"id": 566, "parent": 565, "name": "Pet animals", "nature": "Items", "level": 5, "code": "A.09.03.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.04343, "division": "Recreation, sport and culture"}, {"id": 567, "parent": 546, "name": "Recreational services", "nature": "Groups", "level": 2, "code": "A.09.04", "leaf": "N", "indent": 12, "weight": 0.28991, "division": "Recreation, sport and culture"}, {"id": 568, "parent": 567, "name": "Recreational and sporting services", "nature": "Classes", "level": 3, "code": "A.09.04.01", "leaf": "N", "indent": 16, "weight": 0.28991, "division": "Recreation, sport and culture"}, {"id": 569, "parent": 568, "name": "Recreational and leisure services", "nature": "Sub-classes", "level": 4, "code": "A.09.04.01.01", "leaf": "N", "indent": 20, "weight": 0.17967, "division": "Recreation, sport and culture"}, {"id": 570, "parent": 569, "name": "Other entertainment (mela, fair, picnic, etc.)", "nature": "Items", "level": 5, "code": "A.09.04.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.17967, "division": "Recreation, sport and culture"}, {"id": 571, "parent": 568, "name": "Services associated with the practice of sports", "nature": "Sub-classes", "level": 4, "code": "A.09.04.01.02", "leaf": "N", "indent": 20, "weight": 0.11024, "division": "Recreation, sport and culture"}, {"id": 572, "parent": 571, "name": "Club, gym, swimming fees and other subscriptions", "nature": "Items", "level": 5, "code": "A.09.04.01.02.01", "leaf": "Y", "indent": 24, "weight": 0.11024, "division": "Recreation, sport and culture"}, {"id": 573, "parent": 546, "name": "Cultural goods", "nature": "Groups", "level": 2, "code": "A.09.05", "leaf": "N", "indent": 12, "weight": 0.00881, "division": "Recreation, sport and culture"}, {"id": 574, "parent": 573, "name": "Musical instruments", "nature": "Classes", "level": 3, "code": "A.09.05.01", "leaf": "N", "indent": 16, "weight": 0.00881, "division": "Recreation, sport and culture"}, {"id": 575, "parent": 574, "name": "Musical instruments", "nature": "Sub-classes", "level": 4, "code": "A.09.05.01.01", "leaf": "N", "indent": 20, "weight": 0.00881, "division": "Recreation, sport and culture"}, {"id": 576, "parent": 575, "name": "Musical instruments", "nature": "Items", "level": 5, "code": "A.09.05.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.00881, "division": "Recreation, sport and culture"}, {"id": 577, "parent": 546, "name": "Cultural services", "nature": "Groups", "level": 2, "code": "A.09.06", "leaf": "N", "indent": 12, "weight": 0.17017, "division": "Recreation, sport and culture"}, {"id": 578, "parent": 577, "name": "Services provided by cinemas, theatres and concert venues", "nature": "Classes", "level": 3, "code": "A.09.06.01", "leaf": "N", "indent": 16, "weight": 0.12822, "division": "Recreation, sport and culture"}, {"id": 579, "parent": 578, "name": "Cinema, theatre", "nature": "Sub-classes", "level": 4, "code": "A.09.06.01.01", "leaf": "N", "indent": 20, "weight": 0.12822, "division": "Recreation, sport and culture"}, {"id": 580, "parent": 579, "name": "Cinema, theatre", "nature": "Items", "level": 5, "code": "A.09.06.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.12822, "division": "Recreation, sport and culture"}, {"id": 581, "parent": 577, "name": "Photographic services", "nature": "Classes", "level": 3, "code": "A.09.06.02", "leaf": "N", "indent": 16, "weight": 0.04195, "division": "Recreation, sport and culture"}, {"id": 582, "parent": 581, "name": "Photography", "nature": "Sub-classes", "level": 4, "code": "A.09.06.02.01", "leaf": "N", "indent": 20, "weight": 0.04195, "division": "Recreation, sport and culture"}, {"id": 583, "parent": 582, "name": "Photography", "nature": "Items", "level": 5, "code": "A.09.06.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.04195, "division": "Recreation, sport and culture"}, {"id": 584, "parent": 546, "name": "Newspapers, books and stationery", "nature": "Groups", "level": 2, "code": "A.09.07", "leaf": "N", "indent": 12, "weight": 0.7619, "division": "Recreation, sport and culture"}, {"id": 585, "parent": 584, "name": "Books", "nature": "Classes", "level": 3, "code": "A.09.07.01", "leaf": "N", "indent": 16, "weight": 0.45858, "division": "Recreation, sport and culture"}, {"id": 586, "parent": 585, "name": "Educational books and textbooks", "nature": "Sub-classes", "level": 4, "code": "A.09.07.01.01", "leaf": "N", "indent": 20, "weight": 0.45858, "division": "Recreation, sport and culture"}, {"id": 587, "parent": 586, "name": "Books/ journals", "nature": "Items", "level": 5, "code": "A.09.07.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.45858, "division": "Recreation, sport and culture"}, {"id": 588, "parent": 584, "name": "Newspapers and periodicals", "nature": "Classes", "level": 3, "code": "A.09.07.02", "leaf": "N", "indent": 16, "weight": 0.09012, "division": "Recreation, sport and culture"}, {"id": 589, "parent": 588, "name": "Newspapers and periodicals", "nature": "Sub-classes", "level": 4, "code": "A.09.07.02.01", "leaf": "N", "indent": 20, "weight": 0.09012, "division": "Recreation, sport and culture"}, {"id": 590, "parent": 589, "name": "Newspapers and periodicals", "nature": "Items", "level": 5, "code": "A.09.07.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.09012, "division": "Recreation, sport and culture"}, {"id": 591, "parent": 584, "name": "Stationery and drawing materials", "nature": "Classes", "level": 3, "code": "A.09.07.03", "leaf": "N", "indent": 16, "weight": 0.2132, "division": "Recreation, sport and culture"}, {"id": 592, "parent": 591, "name": "Stationery and drawing materials", "nature": "Sub-classes", "level": 4, "code": "A.09.07.03.01", "leaf": "N", "indent": 20, "weight": 0.2132, "division": "Recreation, sport and culture"}, {"id": 593, "parent": 592, "name": "Stationery", "nature": "Items", "level": 5, "code": "A.09.07.03.01.01", "leaf": "Y", "indent": 24, "weight": 0.2132, "division": "Recreation, sport and culture"}, {"id": 594, "parent": 0, "name": "Education services", "nature": "Divisions", "level": 1, "code": "A.10", "leaf": "N", "indent": 8, "weight": 3.33331, "division": "Education services"}, {"id": 595, "parent": 594, "name": "Early childhood and primary education", "nature": "Groups", "level": 2, "code": "A.10.01", "leaf": "N", "indent": 12, "weight": 1.58428, "division": "Education services"}, {"id": 596, "parent": 595, "name": "Early childhood and primary education", "nature": "Classes", "level": 3, "code": "A.10.01.01", "leaf": "N", "indent": 16, "weight": 1.58428, "division": "Education services"}, {"id": 597, "parent": 596, "name": "Primary education", "nature": "Sub-classes", "level": 4, "code": "A.10.01.01.01", "leaf": "N", "indent": 20, "weight": 1.58428, "division": "Education services"}, {"id": 598, "parent": 597, "name": "Tuition fees (Primary/Upper Primary class)", "nature": "Items", "level": 5, "code": "A.10.01.01.01.01", "leaf": "Y", "indent": 24, "weight": 1.58428, "division": "Education services"}, {"id": 599, "parent": 594, "name": "Secondary education", "nature": "Groups", "level": 2, "code": "A.10.02", "leaf": "N", "indent": 12, "weight": 0.60478, "division": "Education services"}, {"id": 600, "parent": 599, "name": "Secondary education", "nature": "Classes", "level": 3, "code": "A.10.02.01", "leaf": "N", "indent": 16, "weight": 0.60478, "division": "Education services"}, {"id": 601, "parent": 600, "name": "Secondary education", "nature": "Sub-classes", "level": 4, "code": "A.10.02.01.01", "leaf": "N", "indent": 20, "weight": 0.60478, "division": "Education services"}, {"id": 602, "parent": 601, "name": "Tuition fees (Secondary/Upper Secondary class)", "nature": "Items", "level": 5, "code": "A.10.02.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.60478, "division": "Education services"}, {"id": 603, "parent": 594, "name": "Higher education", "nature": "Groups", "level": 2, "code": "A.10.03", "leaf": "N", "indent": 12, "weight": 0.50753, "division": "Education services"}, {"id": 604, "parent": 603, "name": "Higher education", "nature": "Classes", "level": 3, "code": "A.10.03.01", "leaf": "N", "indent": 16, "weight": 0.50753, "division": "Education services"}, {"id": 605, "parent": 604, "name": "Higher education", "nature": "Sub-classes", "level": 4, "code": "A.10.03.01.01", "leaf": "N", "indent": 20, "weight": 0.50753, "division": "Education services"}, {"id": 606, "parent": 605, "name": "Tuition fees (Higher education)", "nature": "Items", "level": 5, "code": "A.10.03.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.50753, "division": "Education services"}, {"id": 607, "parent": 594, "name": "Education not defined by level", "nature": "Groups", "level": 2, "code": "A.10.04", "leaf": "N", "indent": 12, "weight": 0.63672, "division": "Education services"}, {"id": 608, "parent": 607, "name": "Education not defined by level", "nature": "Classes", "level": 3, "code": "A.10.04.01", "leaf": "N", "indent": 16, "weight": 0.63672, "division": "Education services"}, {"id": 609, "parent": 608, "name": "Private tutor/ coaching centre and other educational expenses", "nature": "Sub-classes", "level": 4, "code": "A.10.04.01.01", "leaf": "N", "indent": 20, "weight": 0.63672, "division": "Education services"}, {"id": 610, "parent": 609, "name": "Private tutor/ coaching centre", "nature": "Items", "level": 5, "code": "A.10.04.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.53668, "division": "Education services"}, {"id": 611, "parent": 609, "name": "Other educational expenses", "nature": "Items", "level": 5, "code": "A.10.04.01.01.02", "leaf": "Y", "indent": 24, "weight": 0.10004, "division": "Education services"}, {"id": 612, "parent": 0, "name": "Restaurants and accommodation services", "nature": "Divisions", "level": 1, "code": "A.11", "leaf": "N", "indent": 8, "weight": 3.34752, "division": "Restaurants and accommodation services"}, {"id": 613, "parent": 612, "name": "Food and beverage serving services", "nature": "Groups", "level": 2, "code": "A.11.01", "leaf": "N", "indent": 12, "weight": 3.32966, "division": "Restaurants and accommodation services"}, {"id": 614, "parent": 613, "name": "Restaurants, cafes and the like", "nature": "Classes", "level": 3, "code": "A.11.01.01", "leaf": "N", "indent": 16, "weight": 3.32966, "division": "Restaurants and accommodation services"}, {"id": 615, "parent": 614, "name": "Restaurants, cafes and the like -with full service", "nature": "Sub-classes", "level": 4, "code": "A.11.01.01.01", "leaf": "N", "indent": 20, "weight": 1.20185, "division": "Restaurants and accommodation services"}, {"id": 616, "parent": 615, "name": "Cooked meals", "nature": "Items", "level": 5, "code": "A.11.01.01.01.01", "leaf": "Y", "indent": 24, "weight": 1.20185, "division": "Restaurants and accommodation services"}, {"id": 617, "parent": 614, "name": "Restaurants, cafes and the like -with limited service", "nature": "Sub-classes", "level": 4, "code": "A.11.01.01.02", "leaf": "N", "indent": 20, "weight": 2.12781, "division": "Restaurants and accommodation services"}, {"id": 618, "parent": 617, "name": "Cooked snacks", "nature": "Items", "level": 5, "code": "A.11.01.01.02.01", "leaf": "Y", "indent": 24, "weight": 2.12781, "division": "Restaurants and accommodation services"}, {"id": 619, "parent": 612, "name": "Accommodation services", "nature": "Groups", "level": 2, "code": "A.11.02", "leaf": "N", "indent": 12, "weight": 0.01786, "division": "Restaurants and accommodation services"}, {"id": 620, "parent": 619, "name": "Accommodation services", "nature": "Classes", "level": 3, "code": "A.11.02.01", "leaf": "N", "indent": 16, "weight": 0.01786, "division": "Restaurants and accommodation services"}, {"id": 621, "parent": 620, "name": "Hotels, motels, inns and similar accommodation services", "nature": "Sub-classes", "level": 4, "code": "A.11.02.01.01", "leaf": "N", "indent": 20, "weight": 0.01786, "division": "Restaurants and accommodation services"}, {"id": 622, "parent": 621, "name": "Hotel lodging charges", "nature": "Items", "level": 5, "code": "A.11.02.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.01786, "division": "Restaurants and accommodation services"}, {"id": 623, "parent": 0, "name": "Personal care, social protection and miscellaneous goods & services", "nature": "Divisions", "level": 1, "code": "A.12", "leaf": "N", "indent": 8, "weight": 5.03776, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 624, "parent": 623, "name": "Personal care", "nature": "Groups", "level": 2, "code": "A.12.01", "leaf": "N", "indent": 12, "weight": 3.46033, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 625, "parent": 624, "name": "Appliances for personal care", "nature": "Classes", "level": 3, "code": "A.12.01.01", "leaf": "N", "indent": 16, "weight": 0.021, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 626, "parent": 625, "name": "Purchase of appliances for personal care", "nature": "Sub-classes", "level": 4, "code": "A.12.01.01.01", "leaf": "N", "indent": 20, "weight": 0.021, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 627, "parent": 626, "name": "Other personal goods", "nature": "Items", "level": 5, "code": "A.12.01.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.021, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 628, "parent": 624, "name": "Other appliances, articles and products for personal care", "nature": "Classes", "level": 3, "code": "A.12.01.02", "leaf": "N", "indent": 16, "weight": 2.72393, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 629, "parent": 628, "name": "Other appliances, articles and products for personal care", "nature": "Sub-classes", "level": 4, "code": "A.12.01.02.01", "leaf": "N", "indent": 20, "weight": 2.72393, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 630, "parent": 629, "name": "Toilet soap, body-wash, hand-wash, shower gel and face-wash", "nature": "Items", "level": 5, "code": "A.12.01.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.50165, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 631, "parent": 629, "name": "Perfume, body spray, deodorant and roll-ons", "nature": "Items", "level": 5, "code": "A.12.01.02.01.02", "leaf": "Y", "indent": 24, "weight": 0.22698, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 632, "parent": 629, "name": "Powder, cream, body lotion and moisturizers", "nature": "Items", "level": 5, "code": "A.12.01.02.01.03", "leaf": "Y", "indent": 24, "weight": 0.28701, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 633, "parent": 629, "name": "Toothpaste, mouthwash and toothbrush", "nature": "Items", "level": 5, "code": "A.12.01.02.01.04", "leaf": "Y", "indent": 24, "weight": 0.28336, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 634, "parent": 629, "name": "Hair oil and hair colour", "nature": "Items", "level": 5, "code": "A.12.01.02.01.05", "leaf": "Y", "indent": 24, "weight": 0.27819, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 635, "parent": 629, "name": "Shampoo, conditioner, hair serum/gel and hair cream", "nature": "Items", "level": 5, "code": "A.12.01.02.01.06", "leaf": "Y", "indent": 24, "weight": 0.21009, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 636, "parent": 629, "name": "Sanitary napkins", "nature": "Items", "level": 5, "code": "A.12.01.02.01.07", "leaf": "Y", "indent": 24, "weight": 0.19717, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 637, "parent": 629, "name": "Baby products", "nature": "Items", "level": 5, "code": "A.12.01.02.01.08", "leaf": "Y", "indent": 24, "weight": 0.07032, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 638, "parent": 629, "name": "Shaving blades, shaving stick and razor", "nature": "Items", "level": 5, "code": "A.12.01.02.01.09", "leaf": "Y", "indent": 24, "weight": 0.06981, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 639, "parent": 629, "name": "Shaving cream, shaving foam, aftershave lotion and aftershave balm", "nature": "Items", "level": 5, "code": "A.12.01.02.01.10", "leaf": "Y", "indent": 24, "weight": 0.05832, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 640, "parent": 629, "name": "Sanitizer", "nature": "Items", "level": 5, "code": "A.12.01.02.01.11", "leaf": "Y", "indent": 24, "weight": 0.0085, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 641, "parent": 629, "name": "Weighing machine", "nature": "Items", "level": 5, "code": "A.12.01.02.01.12", "leaf": "Y", "indent": 24, "weight": 0.00201, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 642, "parent": 629, "name": "Other beauty products", "nature": "Items", "level": 5, "code": "A.12.01.02.01.13", "leaf": "Y", "indent": 24, "weight": 0.39084, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 643, "parent": 629, "name": "Other toilet articles", "nature": "Items", "level": 5, "code": "A.12.01.02.01.14", "leaf": "Y", "indent": 24, "weight": 0.0756, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 644, "parent": 629, "name": "Other hair products", "nature": "Items", "level": 5, "code": "A.12.01.02.01.15", "leaf": "Y", "indent": 24, "weight": 0.06408, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 645, "parent": 624, "name": "Hairdressing salons and personal grooming establishments", "nature": "Classes", "level": 3, "code": "A.12.01.03", "leaf": "N", "indent": 16, "weight": 0.71539, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 646, "parent": 645, "name": "Personal grooming treatments", "nature": "Sub-classes", "level": 4, "code": "A.12.01.03.01", "leaf": "N", "indent": 20, "weight": 0.71539, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 647, "parent": 646, "name": "Barber, beautician and spas", "nature": "Items", "level": 5, "code": "A.12.01.03.01.01", "leaf": "Y", "indent": 24, "weight": 0.71539, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 648, "parent": 623, "name": "Other personal effects", "nature": "Groups", "level": 2, "code": "A.12.02", "leaf": "N", "indent": 12, "weight": 1.39391, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 649, "parent": 648, "name": "Jewellery and watches", "nature": "Classes", "level": 3, "code": "A.12.02.01", "leaf": "N", "indent": 16, "weight": 1.20169, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 650, "parent": 649, "name": "Purchase of jewellery and watches", "nature": "Sub-classes", "level": 4, "code": "A.12.02.01.01", "leaf": "N", "indent": 20, "weight": 1.20169, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 651, "parent": 650, "name": "Gold /diamond /platinum jewellery", "nature": "Items", "level": 5, "code": "A.12.02.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.62297, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 652, "parent": 650, "name": "Silver jewellery", "nature": "Items", "level": 5, "code": "A.12.02.01.01.02", "leaf": "Y", "indent": 24, "weight": 0.31265, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 653, "parent": 650, "name": "Clock, watch, smartwatch and fitness tracker", "nature": "Items", "level": 5, "code": "A.12.02.01.01.03", "leaf": "Y", "indent": 24, "weight": 0.07132, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 654, "parent": 650, "name": "Jewels, pearls, precious stones", "nature": "Items", "level": 5, "code": "A.12.02.01.01.04", "leaf": "Y", "indent": 24, "weight": 0.01254, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 655, "parent": 650, "name": "Other jewellery and ornaments", "nature": "Items", "level": 5, "code": "A.12.02.01.01.05", "leaf": "Y", "indent": 24, "weight": 0.18221, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 656, "parent": 648, "name": "Other personal effects n.e.c.", "nature": "Classes", "level": 3, "code": "A.12.02.02", "leaf": "N", "indent": 16, "weight": 0.1922, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 657, "parent": 656, "name": "Travel goods, baby articles and other personal effects n.e.c.", "nature": "Sub-classes", "level": 4, "code": "A.12.02.02.01", "leaf": "N", "indent": 20, "weight": 0.1922, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 658, "parent": 657, "name": "Back-pack, handbags, vanity bags, purse and clutch", "nature": "Items", "level": 5, "code": "A.12.02.02.01.01", "leaf": "Y", "indent": 24, "weight": 0.0936, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 659, "parent": 657, "name": "Suitcase, trolley bag, duffle bag and trunk", "nature": "Items", "level": 5, "code": "A.12.02.02.01.02", "leaf": "Y", "indent": 24, "weight": 0.06548, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 660, "parent": 657, "name": "Umbrella and Raincoat", "nature": "Items", "level": 5, "code": "A.12.02.02.01.03", "leaf": "Y", "indent": 24, "weight": 0.03312, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 661, "parent": 623, "name": "Other services", "nature": "Groups", "level": 2, "code": "A.12.03", "leaf": "N", "indent": 12, "weight": 0.18351, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 662, "parent": 661, "name": "Other services", "nature": "Classes", "level": 3, "code": "A.12.03.01", "leaf": "N", "indent": 16, "weight": 0.18351, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 663, "parent": 662, "name": "Religious services", "nature": "Sub-classes", "level": 4, "code": "A.12.03.01.01", "leaf": "N", "indent": 20, "weight": 0.09682, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 664, "parent": 663, "name": "Priest", "nature": "Items", "level": 5, "code": "A.12.03.01.01.01", "leaf": "Y", "indent": 24, "weight": 0.09682, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 665, "parent": 662, "name": "Other services n.e.c.", "nature": "Sub-classes", "level": 4, "code": "A.12.03.01.02", "leaf": "N", "indent": 20, "weight": 0.08669, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 666, "parent": 665, "name": "Photocopying charges", "nature": "Items", "level": 5, "code": "A.12.03.01.02.01", "leaf": "Y", "indent": 24, "weight": 0.054, "division": "Personal care, social protection and miscellaneous goods & services"}, {"id": 667, "parent": 665, "name": "Legal expenses", "nature": "Items", "level": 5, "code": "A.12.03.01.02.02", "leaf": "Y", "indent": 24, "weight": 0.03269, "division": "Personal care, social protection and miscellaneous goods & services"}];
+
+const DIVISION_COLORS = ["#D94F4F", "#E58A3A", "#D8B23A", "#65A85A", "#3F9E9A", "#4D78B8", "#7656A6", "#A64D82", "#C95B7A", "#5E8C6A", "#B66A3C", "#557AAE"];
+
+const LEVEL_NAMES = {
+    0: "General Index",
+    1: "Divisions",
+    2: "Groups",
+    3: "Classes",
+    4: "Sub-classes",
+    5: "Items"
+};
+
+let selectedId = 0;
+
+
+// ============================================================
+// BASIC FUNCTIONS
+// ============================================================
+
+function children(id) {
+
+    return DATA.filter(
+        d => d.parent === id
+    );
+
+}
+
+
+function getNode(id) {
+
+    return DATA.find(
+        d => d.id === id
+    );
+
+}
+
+
+// ============================================================
+// COLOUR FUNCTIONS
+// ============================================================
+
+function divisionNode(node) {
+
+    if(node.level === 1)
+        return node;
+
+    let current = node;
+
+    while(current.parent !== null) {
+
+        const parent =
+            getNode(current.parent);
+
+        if(!parent)
+            break;
+
+        if(parent.level === 1)
+            return parent;
+
+        current = parent;
+
+    }
+
+    return null;
+
+}
+
+
+function hexToRgb(hex) {
+
+    hex = hex.replace("#","");
+
+    return {
+        r: parseInt(hex.substring(0,2),16),
+        g: parseInt(hex.substring(2,4),16),
+        b: parseInt(hex.substring(4,6),16)
+    };
+
+}
+
+
+function lighten(hex, amount) {
+
+    const c = hexToRgb(hex);
+
+    return "rgb(" +
+
+        Math.round(
+            c.r + (255-c.r)*amount
+        ) + "," +
+
+        Math.round(
+            c.g + (255-c.g)*amount
+        ) + "," +
+
+        Math.round(
+            c.b + (255-c.b)*amount
+        ) +
+
+        ")";
+
+}
+
+
+function nodeColor(node) {
+
+    if(node.level === 0)
+        return "#2F5D62";
+
+    const div =
+        divisionNode(node);
+
+    if(!div)
+        return "#65727A";
+
+    const divisions =
+        children(0);
+
+    const idx =
+        divisions.findIndex(
+            d => d.id === div.id
+        );
+
+    const base =
+        DIVISION_COLORS[
+            idx % DIVISION_COLORS.length
+        ];
+
+    if(node.level === 1)
+        return base;
+
+    const amount = {
+
+        2: .16,
+        3: .28,
+        4: .40,
+        5: .52
+
+    }[node.level] || .52;
+
+    return lighten(
+        base,
+        amount
+    );
+
+}
+
+
+// ============================================================
+// SIDEBAR TREE
+// ============================================================
+
+function renderTree() {
+
+    const container =
+        document.getElementById("tree");
+
+    container.innerHTML = "";
+
+    const root =
+        getNode(0);
+
+    drawNode(
+        root,
+        container,
+        0
+    );
+
+}
+
+
+function drawNode(
+    node,
+    container,
+    depth
+) {
+
+    const kids =
+        children(node.id);
+
+    const row =
+        document.createElement("div");
+
+    row.className =
+        "tree-row" +
+        (
+            selectedId === node.id
+            ? " selected"
+            : ""
+        );
+
+    row.style.paddingLeft =
+        (depth * 13) + "px";
+
+
+    const toggle =
+        document.createElement("button");
+
+    toggle.className =
+        "toggle";
+
+    toggle.textContent =
+        kids.length
+        ? "+"
+        : "•";
+
+
+    const label =
+        document.createElement("span");
+
+    label.className =
+        "tree-label";
+
+
+    const type =
+        document.createElement("span");
+
+    type.className =
+        "tree-type";
+
+    type.textContent =
+        "(" +
+        node.nature.toLowerCase() +
+        ") ";
+
+
+    const name =
+        document.createElement("span");
+
+    name.textContent =
+        node.name;
+
+
+    const weight =
+        document.createElement("span");
+
+    weight.className =
+        "tree-weight";
+
+    weight.textContent =
+        node.weight.toFixed(2) +
+        "%";
+
+
+    label.appendChild(type);
+    label.appendChild(name);
+
+    row.appendChild(toggle);
+    row.appendChild(label);
+    row.appendChild(weight);
+
+    container.appendChild(row);
+
+
+    let open = false;
+
+
+    toggle.onclick = function(event) {
+
+        event.stopPropagation();
+
+        if(!kids.length)
+            return;
+
+        open = !open;
+
+        toggle.textContent =
+            open ? "−" : "+";
+
+        if(open) {
+
+            const childContainer =
+                document.createElement("div");
+
+            childContainer.className =
+                "children";
+
+            kids.forEach(
+                child =>
+                    drawNode(
+                        child,
+                        childContainer,
+                        depth + 1
+                    )
+            );
+
+            row.after(
+                childContainer
+            );
+
+        } else {
+
+            const next =
+                row.nextElementSibling;
+
+            if(next &&
+               next.classList.contains(
+                   "children"
+               )) {
+
+                next.remove();
+
+            }
+
+        }
+
+    };
+
+
+    row.onclick =
+        function() {
+
+            selectNode(
+                node.id
+            );
+
+        };
+
+}
+
+
+// ============================================================
+// SELECT NODE
+// ============================================================
+
+function selectNode(id) {
+
+    selectedId = id;
+
+    const node =
+        getNode(id);
+
+    document.getElementById(
+        "selectedName"
+    ).textContent =
+        node.name;
+
+    document.getElementById(
+        "selectedCode"
+    ).textContent =
+        node.code;
+
+    document.getElementById(
+        "selectedNature"
+    ).textContent =
+        node.nature;
+
+    document.getElementById(
+        "selectedLevel"
+    ).textContent =
+        node.level;
+
+    document.getElementById(
+        "selectedWeight"
+    ).textContent =
+        node.weight.toFixed(2) +
+        "%";
+
+    renderTree();
+
+    renderTreemap(
+        node
+    );
+
+}
+
+
+// ============================================================
+// TREEMAP
+// ============================================================
+
+function renderTreemap(parent) {
+
+    const kids =
+        children(parent.id);
+
+    const div =
+        document.getElementById(
+            "treemap"
+        );
+
+    if(!kids.length) {
+
+        Plotly.react(
+            div,
+            [],
+            {
+                margin: {
+                    l:0,r:0,t:0,b:0
+                }
+            }
+        );
+
+        return;
+
+    }
+
+
+    const labels =
+        kids.map(
+            d => d.name
+        );
+
+    const ids =
+        kids.map(
+            d => String(d.id)
+        );
+
+    const values =
+        kids.map(
+            d => d.weight
+        );
+
+    const colors =
+        kids.map(
+            d => nodeColor(d)
+        );
+
+    const shares =
+        kids.map(
+            d => parent.weight
+            ? d.weight /
+              parent.weight *
+              100
+            : 0
+        );
+
+
+    const customdata =
+        kids.map(
+            (d,i) => [
+
+                d.code,
+
+                d.nature,
+
+                d.weight,
+
+                shares[i],
+
+                d.indent
+
+            ]
+        );
+
+
+    const trace = {
+
+        type: "treemap",
+
+        labels: labels,
+
+        ids: ids,
+
+        parents:
+            kids.map(
+                () => ""
+            ),
+
+        values: values,
+
+        branchvalues:
+            "total",
+
+        customdata:
+            customdata,
+
+        marker: {
+
+            colors: colors,
+
+            line: {
+
+                color: "white",
+
+                width: 2
+
+            }
+
+        },
+
+        texttemplate:
+            "<b>%{label}</b>" +
+            "<br>%{customdata[3]:.1f}%" +
+            "<br>%{customdata[2]:.2f}%",
+
+        hovertemplate:
+
+            "<b>%{label}</b>" +
+
+            "<br>Code: %{customdata[0]}" +
+
+            "<br>Nature: %{customdata[1]}" +
+
+            "<br>Weight: %{customdata[2]:.2f}%" +
+
+            "<br>Share of parent: %{customdata[3]:.2f}%" +
+
+            "<br>Indentation: %{customdata[4]} spaces" +
+
+            "<extra></extra>"
+
+    };
+
+
+    const layout = {
+
+        margin: {
+            l: 4,
+            r: 4,
+            t: 4,
+            b: 4
+        },
+
+        paper_bgcolor:
+            "white",
+
+        plot_bgcolor:
+            "white",
+
+        font: {
+            family:
+                "Arial, sans-serif"
+        },
+
+        uniformtext: {
+            minsize: 9,
+            mode: "hide"
+        }
+
+    };
+
+
+    Plotly.react(
+        div,
+        [trace],
+        layout,
+        {
+            responsive: true,
+            displaylogo: false
+        }
+    );
+
+}
+
+
+// ============================================================
+// INITIALISE
+// ============================================================
+
+renderTree();
+
+renderTreemap(
+    getNode(0)
+);
+
+</script>
+
+</body>
+
+</html>
